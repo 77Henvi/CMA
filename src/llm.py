@@ -1,8 +1,20 @@
 import os
+import re
 import json
 import urllib.request
 import urllib.error
 from typing import Dict, Any, Optional
+
+from .env import load_env
+
+load_env()
+
+
+def _parse_json(text: str) -> Dict[str, Any]:
+    """Parse JSON even if the model wrapped it in ```json fences."""
+    text = text.strip()
+    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
+    return json.loads(text)
 
 class LLMClient:
     """
@@ -29,8 +41,9 @@ class LLMClient:
         return None
 
     def _call_gemini(self, system_prompt: str, user_prompt: str) -> Optional[Dict[str, Any]]:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.gemini_api_key}"
-        headers = {"Content-Type": "application/json"}
+        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")  # gemini-1.5-flash has been retired
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        headers = {"Content-Type": "application/json", "x-goog-api-key": self.gemini_api_key}
         payload = {
             "contents": [
                 {
@@ -48,7 +61,7 @@ class LLMClient:
             with urllib.request.urlopen(req, timeout=30) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 text_content = res_data["candidates"][0]["content"]["parts"][0]["text"]
-                return json.loads(text_content.strip())
+                return _parse_json(text_content)
         except Exception as e:
             print(f"[LLM] Gemini API call error: {e}")
             return None
@@ -72,7 +85,7 @@ class LLMClient:
             with urllib.request.urlopen(req, timeout=30) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 text_content = res_data["choices"][0]["message"]["content"]
-                return json.loads(text_content.strip())
+                return _parse_json(text_content)
         except Exception as e:
             print(f"[LLM] OpenAI API call error: {e}")
             return None
@@ -84,7 +97,7 @@ class LLMClient:
             "Authorization": f"Bearer {self.groq_api_key}"
         }
         payload = {
-            "model": "llama-3.3-70b-versatile",
+            "model": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"{user_prompt}\n\nReturn pure JSON format."}
@@ -96,7 +109,7 @@ class LLMClient:
             with urllib.request.urlopen(req, timeout=30) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 text_content = res_data["choices"][0]["message"]["content"]
-                return json.loads(text_content.strip())
+                return _parse_json(text_content)
         except Exception as e:
             print(f"[LLM] Groq API call error: {e}")
             return None

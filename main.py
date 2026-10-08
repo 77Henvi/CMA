@@ -12,6 +12,9 @@ if sys.stdout and hasattr(sys.stdout, "reconfigure"):
 # Ensure local imports work smoothly
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from src.env import load_env
+load_env()
+
 from src.pipeline import ContentCreationPipeline
 from src.formatters import format_production_pack_markdown
 

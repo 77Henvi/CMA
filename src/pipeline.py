@@ -13,6 +13,7 @@ if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
+from .env import BASE_DIR, load_env
 from .models import ProductionPack
 from .llm import LLMClient
 from .agents.strategist import StrategistAgent
@@ -21,13 +22,16 @@ from .agents.shot_director import ShotDirectorAgent
 from .agents.qa_evaluator import QAEvaluatorAgent
 from .formatters import format_production_pack_markdown
 
+load_env()
+
+
 class ContentCreationPipeline:
     """
     Main Orchestrator for the 4-Agent Content Creation Team.
     Flow:
     Strategist -> Scriptwriter -> Shot Director -> QA Evaluator -> Production Pack
     """
-    def __init__(self, brand_config_path: str = "config/brand_dna.yaml"):
+    def __init__(self, brand_config_path: str = os.path.join(BASE_DIR, "config", "brand_dna.yaml")):
         self.brand_config = self._load_yaml(brand_config_path)
         self.llm_client = LLMClient()
 
@@ -83,7 +87,7 @@ class ContentCreationPipeline:
 
         return production_pack
 
-    def save_output(self, pack: ProductionPack, output_dir: str = "outputs") -> str:
+    def save_output(self, pack: ProductionPack, output_dir: str = os.path.join(BASE_DIR, "outputs")) -> str:
         os.makedirs(output_dir, exist_ok=True)
         filename_base = f"{pack.project_id}_{pack.script.concept.pillar}"
 
