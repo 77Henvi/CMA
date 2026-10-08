@@ -908,3 +908,100 @@ document.getElementById("downloadMdBtn")?.addEventListener("click", () => {
   a.download = `Production_Pack_${Date.now()}.json`;
   a.click();
 });
+
+// --- HIGGSFIELD AI MODAL LOGIC ---
+const higgsfieldModal = document.getElementById("higgsfieldModal");
+const higgsfieldBtn = document.getElementById("higgsfieldBtn");
+const closeHiggsfieldModal = document.getElementById("closeHiggsfieldModal");
+const tabOfficeVisual = document.getElementById("tabOfficeVisual");
+const tabBrollVisual = document.getElementById("tabBrollVisual");
+const higgsfieldPrompt = document.getElementById("higgsfieldPrompt");
+const submitHiggsfieldBtn = document.getElementById("submitHiggsfieldBtn");
+const higgsfieldResultArea = document.getElementById("higgsfieldResultArea");
+const hfStatusBadge = document.getElementById("hfStatusBadge");
+const hfResultMsg = document.getElementById("hfResultMsg");
+const hfVideoContainer = document.getElementById("hfVideoContainer");
+const hfVideoPlayer = document.getElementById("hfVideoPlayer");
+
+let currentHfMode = "office";
+
+if (higgsfieldBtn && higgsfieldModal) {
+  higgsfieldBtn.addEventListener("click", () => {
+    higgsfieldModal.style.display = "flex";
+  });
+
+  closeHiggsfieldModal?.addEventListener("click", () => {
+    higgsfieldModal.style.display = "none";
+  });
+
+  // Close on backdrop click
+  higgsfieldModal.addEventListener("click", (e) => {
+    if (e.target === higgsfieldModal) {
+      higgsfieldModal.style.display = "none";
+    }
+  });
+
+  tabOfficeVisual?.addEventListener("click", () => {
+    currentHfMode = "office";
+    tabOfficeVisual.classList.add("active");
+    tabBrollVisual?.classList.remove("active");
+    higgsfieldPrompt.value = "Cinematic high-angle camera pan of an architectural Japanese minimalist creative studio. Warm honey oak long wooden table with miniature aquascaped nano planted aquarium, soft diffused daylight, lush ficus plants, cozy espresso bar.";
+  });
+
+  tabBrollVisual?.addEventListener("click", () => {
+    currentHfMode = "broll";
+    tabBrollVisual.classList.add("active");
+    tabOfficeVisual?.classList.remove("active");
+    const topic = topicInput?.value || "ปลานีออนว่ายในตู้ไม้น้ำ";
+    higgsfieldPrompt.value = `Macro cinematic close-up shot: ${topic}. Crystal clear water, lush aquatic plants, vibrant ornamental fish, natural studio lighting, 4k 60fps cinematic shallow depth of field.`;
+  });
+
+  submitHiggsfieldBtn?.addEventListener("click", async () => {
+    submitHiggsfieldBtn.disabled = true;
+    submitHiggsfieldBtn.innerText = "Synthesizing...";
+    higgsfieldResultArea.style.display = "flex";
+    hfStatusBadge.className = "result-status-badge info";
+    hfStatusBadge.innerText = "Sending to Higgsfield AI...";
+    hfResultMsg.innerText = "Connecting to Kling 3.0 Pro / Soul v2 engine...";
+    hfVideoContainer.style.display = "none";
+
+    const endpoint = currentHfMode === "office" ? "/api/higgsfield/generate-office" : "/api/higgsfield/generate-broll";
+    const payload = currentHfMode === "office" 
+      ? { prompt: higgsfieldPrompt.value, mode: "video" }
+      : { scene_description: higgsfieldPrompt.value, camera_movement: "slow pan" };
+
+    try {
+      const resp = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await resp.json();
+
+      if (data.status === "submitted") {
+        hfStatusBadge.className = "result-status-badge success";
+        hfStatusBadge.innerText = "Job Submitted to Higgsfield";
+        hfResultMsg.innerText = `Request ID: ${data.request_id} (Processing asynchronously on Higgsfield Cloud GPU)`;
+      } else if (data.status === "insufficient_credits") {
+        hfStatusBadge.className = "result-status-badge warning";
+        hfStatusBadge.innerText = "Account Connected (Credits Needed)";
+        hfResultMsg.innerHTML = `${data.message}<br><small style="color:var(--text-muted); display:block; margin-top:4px;">A preview sample has been loaded below to demonstrate studio integration.</small>`;
+        if (data.sample_preview_url) {
+          hfVideoContainer.style.display = "block";
+          hfVideoPlayer.src = data.sample_preview_url;
+        }
+      } else {
+        hfStatusBadge.className = "result-status-badge info";
+        hfStatusBadge.innerText = "Notice";
+        hfResultMsg.innerText = data.message || "Operation complete.";
+      }
+    } catch (err) {
+      hfStatusBadge.className = "result-status-badge warning";
+      hfStatusBadge.innerText = "Error";
+      hfResultMsg.innerText = "Unable to reach server endpoint: " + err.message;
+    } finally {
+      submitHiggsfieldBtn.disabled = false;
+      submitHiggsfieldBtn.innerText = "Generate Video";
+    }
+  });
+}

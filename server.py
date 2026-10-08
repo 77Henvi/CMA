@@ -19,7 +19,10 @@ if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
+from src.integrations.higgsfield_service import HiggsfieldService
+
 pipeline = ContentCreationPipeline()
+higgsfield_service = HiggsfieldService()
 
 class VirtualOfficeRequestHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -54,6 +57,33 @@ class VirtualOfficeRequestHandler(SimpleHTTPRequestHandler):
                 self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.end_headers()
                 self.wfile.write(json.dumps({"status": "error", "message": str(e)}).encode("utf-8"))
+
+        elif self.path == "/api/higgsfield/generate-office":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            data = json.loads(body) if body else {}
+            prompt = data.get("prompt")
+            mode = data.get("mode", "video")
+
+            result = higgsfield_service.generate_office_visual(prompt=prompt, mode=mode)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(json.dumps(result, ensure_ascii=False).encode("utf-8"))
+
+        elif self.path == "/api/higgsfield/generate-broll":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            data = json.loads(body) if body else {}
+            scene_desc = data.get("scene_description", "ฝูงปลานีออนแหวกว่ายในตู้ไม้น้ำ")
+            movement = data.get("camera_movement", "slow cinematic pan")
+
+            result = higgsfield_service.generate_broll_scene(scene_description=scene_desc, camera_movement=movement)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(json.dumps(result, ensure_ascii=False).encode("utf-8"))
+
         else:
             self.send_response(404)
             self.end_headers()

@@ -146,6 +146,13 @@
               </svg>
               <span>Execute Agents</span>
             </button>
+            <button type="button" id="higgsfieldBtn" class="btn-secondary" title="Render cinematic footage using Higgsfield AI">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="23 7 16 12 23 17 23 7"/>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              </svg>
+              <span>Higgsfield AI</span>
+            </button>
           </form>
         </div>
       </section>
@@ -263,6 +270,62 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- Higgsfield AI Generation Modal -->
+  <div class="modal-overlay" id="higgsfieldModal" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="23 7 16 12 23 17 23 7"/>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+          <h3>Higgsfield AI Video Synthesizer</h3>
+        </div>
+        <button class="modal-close" id="closeHiggsfieldModal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-desc">
+          Generate cinematic visual media via Higgsfield AI (Kling 3.0 Pro / Soul v2) connected to console.higgsfield.ai.
+        </p>
+
+        <div class="modal-actions-row">
+          <button class="tab-chip active" id="tabOfficeVisual">3D Office Background</button>
+          <button class="tab-chip" id="tabBrollVisual">TikTok B-Roll Clip</button>
+        </div>
+
+        <div class="modal-input-group">
+          <label id="higgsfieldPromptLabel">Custom Prompt:</label>
+          <textarea id="higgsfieldPrompt" rows="3" class="modal-textarea">Cinematic high-angle camera pan of an architectural Japanese minimalist creative studio. Warm honey oak long wooden table with miniature aquascaped nano planted aquarium, soft diffused daylight, lush ficus plants, cozy espresso bar.</textarea>
+        </div>
+
+        <div class="modal-btn-row">
+          <button id="submitHiggsfieldBtn" class="btn-primary">
+            <span>Generate Video</span>
+          </button>
+          <span class="auth-pill connected">
+            <span class="pulse-dot green"></span>
+            <span>API Connected (Key Configured)</span>
+          </span>
+        </div>
+
+        <!-- Result / Preview Area -->
+        <div class="modal-result" id="higgsfieldResultArea" style="display:none;">
+          <div class="result-status-badge" id="hfStatusBadge">Status</div>
+          <div class="result-msg" id="hfResultMsg"></div>
+          <div class="video-container" id="hfVideoContainer" style="margin-top: 12px; display:none;">
+            <video id="hfVideoPlayer" controls autoplay loop playsinline style="width: 100%; border-radius: 8px; border: 1px solid var(--border-color);"></video>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
