@@ -1,0 +1,37 @@
+# 3D Minimal Style Guide for Midjourney, Flux, SDXL, and Video Generators
+style_name: "3D Clean Aquatic Minimalism"
+
+core_aesthetic:
+  medium: "3D stylized digital render"
+  texture: "smooth matte clay and soft porcelain texture, clean geometry"
+  water_physics: "translucent stylized crystal-clear water with gentle caustic reflections"
+  lighting: "soft diffuse studio lighting, subtle ambient occlusion, warm ambient rim light"
+  background: "clean monochromatic or soft pastel background, minimal distraction, zero visual clutter"
+  composition: "isometric cutaway view, orthographic perspective, centered focal point, macro details"
+  render_engines: "octane render, cinema 4d aesthetic, blender cycles minimalist style"
+
+color_palettes:
+  primary:
+    - "Soft Sage Green (#A8C3B0)"
+    - "Calm Aqua Blue (#9AD0D3)"
+    - "Warm Sand Beige (#EAE5D9)"
+    - "Clean Ceramic White (#F9F9F8)"
+  accents:
+    - "Neon Coral (#FF6F61)"
+    - "Electric Neon Blue (#00E5FF)"
+    - "Warm Sunset Orange (#FF9F45)"
+
+master_positive_tokens: >-
+  minimalist 3D stylized render, isometric clean aquarium cutaway, smooth matte clay texture,
+  translucent crystal-clear water, soft pastel studio lighting, diffused shadows,
+  clean modern aesthetic, octane render, c4d, elegant simplicity, ultra-sharp focus,
+  no clutter, 8k resolution
+
+master_negative_tokens: >-
+  photorealistic fish with dirty tank, real-life photo, noisy background, dark murky water,
+  cluttered room, low poly rough edges, harsh shadows, distorted geometry, ugly, watermark, text
+
+platforms:
+  tiktok:
+    aspect_ratio: "--ar 9:16"
+    framing: "vertical video format with safety margins for UI elements (likes/comments on right, captions at bottom)"
