@@ -13,16 +13,16 @@ const scene = new THREE.Scene();
 // Atmosphere Presets (Day / Sunset / Night)
 const atmospherePresets = {
   day: {
-    bg: new THREE.Color(0xded7ca),
-    fog: new THREE.Color(0xded7ca),
-    ambient: new THREE.Color(0xf5ede4),
-    ambientInt: 0.9,
-    sunColor: new THREE.Color(0xfffaee),
-    sunInt: 1.3,
-    sunPos: new THREE.Vector3(16, 26, 18),
-    fillColor: new THREE.Color(0xcfd8dc),
-    fillInt: 0.45,
-    deskSpotInt: 0.4,
+    bg: new THREE.Color(0xf6f2eb),
+    fog: new THREE.Color(0xf6f2eb),
+    ambient: new THREE.Color(0xfff8f0),
+    ambientInt: 0.95,
+    sunColor: new THREE.Color(0xfffcf5),
+    sunInt: 1.25,
+    sunPos: new THREE.Vector3(18, 28, 20),
+    fillColor: new THREE.Color(0xe5ded3),
+    fillInt: 0.5,
+    deskSpotInt: 0.45,
     deskSpotColor: new THREE.Color(0xffeedb)
   },
   sunset: {
@@ -105,217 +105,376 @@ const fillLight = new THREE.DirectionalLight(atmospherePresets.day.fillColor, at
 fillLight.position.set(-18, 14, -10);
 scene.add(fillLight);
 
-// --- 3. Material Palette ---
+// --- 3. Material Palette (Elevated Architectural Studio & Muted Earth Tones) ---
 const mat = (color, roughness = 0.65, metalness = 0.04) =>
   new THREE.MeshStandardMaterial({ color, roughness, metalness });
 
-const whiteDeskMat = mat(0xffffff, 0.25, 0.05);
-const richHoneyOakMat = mat(0xc68b59, 0.7, 0.03);
-const darkWalnutMat = mat(0x4a2e18, 0.8, 0.02);
-const steelLegMat = mat(0x282624, 0.35, 0.3);
-const terracottaWallMat = mat(0xdfd4c5, 0.9, 0.0);
-const warmParquetMat = mat(0xd6c6b2, 0.75, 0.05);
-const tealFabricMat = mat(0x254b47, 0.7, 0.0);
-const navyFabricMat = mat(0x1e293b, 0.7, 0.0);
-const skinMat = mat(0xffdec7, 0.55, 0.0);
-const plantGreenMat = mat(0x2e7d32, 0.7, 0.0);
-const coffeeCupMat = mat(0xffffff, 0.3, 0.0);
-const shoeLeatherMat = mat(0x1c1a18, 0.4, 0.1);
-const sneakerWhiteMat = mat(0xf4f4f4, 0.5, 0.0);
+// Architectural Scandinavian/Japanese Studio Palette (Directly matched to user reference)
+const studioWallWhiteMat = mat(0xf3efe8, 0.95, 0.0);
+const studioWallWarmMat = mat(0xeee7dc, 0.92, 0.0);
+const warmAcousticFeltMat = mat(0xe5ddd1, 0.88, 0.0);
+const gridLineMat = new THREE.MeshBasicMaterial({ color: 0xd6ccc0, transparent: true, opacity: 0.55 });
+const pinboardMat = mat(0xd4c7b5, 0.85, 0.0);
+const paperMat = mat(0xf9f7f2, 0.9, 0.0);
+const paperDraftMat = mat(0xe8e0d2, 0.85, 0.0);
+
+// Oak & Furniture
+const whiteDeskMat = mat(0xfdfbf7, 0.35, 0.02);
+const richHoneyOakMat = mat(0xbfa588, 0.75, 0.02); // Pale blonde ash oak
+const naturalOakMat = mat(0xcdbda4, 0.78, 0.02);
+const darkWalnutMat = mat(0x544538, 0.72, 0.02);
+const warmCabinetBeigeMat = mat(0xd5c8b7, 0.75, 0.0);
+const steelLegMat = mat(0x2d2b28, 0.35, 0.25);
+const brassAccentMat = mat(0xcbb179, 0.4, 0.45);
+
+// Chair Fabrics (Dark Charcoal, Sage Green, Rust Clay from reference)
+const tealFabricMat = mat(0x426863, 0.8, 0.0); // Desaturated sage teal
+const navyFabricMat = mat(0x363e46, 0.8, 0.0); // Muted slate navy
+const rustFabricMat = mat(0x8f483c, 0.8, 0.0); // Japanese terracotta rust
+
+// Props & Details
+const skinMat = mat(0xf5d9c4, 0.55, 0.0);
+const plantGreenMat = mat(0x4a634e, 0.75, 0.0);
+const coffeeCupMat = mat(0xfcfaf6, 0.25, 0.0);
+const shoeLeatherMat = mat(0x23201d, 0.5, 0.05);
+const sneakerWhiteMat = mat(0xf7f5f0, 0.6, 0.0);
 
 // --- 4. Architectural Environment Setup ---
-const floorGeo = new THREE.PlaneGeometry(55, 35);
-const floorMesh = new THREE.Mesh(floorGeo, warmParquetMat);
+// Floor with subtle soft warm concrete studio parquet
+const floorGeo = new THREE.PlaneGeometry(60, 40);
+const floorMesh = new THREE.Mesh(floorGeo, mat(0xece5d9, 0.85, 0.02));
 floorMesh.rotation.x = -Math.PI / 2;
 floorMesh.position.y = 0;
 floorMesh.receiveShadow = true;
 scene.add(floorMesh);
 
+// Architectural Rug Area under working bench
+const rugMesh = new THREE.Mesh(new THREE.PlaneGeometry(30, 14), mat(0xdfd6c7, 0.95, 0.0));
+rugMesh.rotation.x = -Math.PI / 2;
+rugMesh.position.set(0, 0.01, 1.2);
+rugMesh.receiveShadow = true;
+scene.add(rugMesh);
+
+// Architectural Back Studio Partition Wall (Multi-layered panels like the reference)
 const wallGroup = new THREE.Group();
 wallGroup.position.set(0, 7.5, -4.8);
 
-const wallMesh = new THREE.Mesh(new THREE.PlaneGeometry(55, 16), terracottaWallMat);
+// Base Back Wall
+const wallMesh = new THREE.Mesh(new THREE.PlaneGeometry(60, 18), studioWallWhiteMat);
 wallMesh.receiveShadow = true;
 wallGroup.add(wallMesh);
 
-const wallArt = [
-  { x: -14, y: 2.2, w: 2.2, h: 2.8, c: 0xcdbda8 },
-  { x: -8, y: 3.2, w: 3.4, h: 2.4, c: 0xd9caa5 },
-  { x: -2, y: 2.8, w: 2.8, h: 3.4, c: 0xe0d4c3 },
-  { x: 5, y: 3.0, w: 4.2, h: 2.8, c: 0xd1bfab },
-  { x: 12, y: 2.4, w: 2.6, h: 3.6, c: 0xcbbba6 }
-];
+// Architectural Grid Wireframe & Partition Mullions (Signature look of reference drawing)
+for (let gx = -26; gx <= 26; gx += 3.2) {
+  const line = new THREE.Mesh(new THREE.BoxGeometry(0.04, 15, 0.04), gridLineMat);
+  line.position.set(gx, 0, 0.02);
+  wallGroup.add(line);
+}
+for (let gy = -6; gy <= 8; gy += 2.8) {
+  const lineH = new THREE.Mesh(new THREE.BoxGeometry(54, 0.04, 0.04), gridLineMat);
+  lineH.position.set(0, gy, 0.02);
+  wallGroup.add(lineH);
+}
 
-wallArt.forEach((art) => {
-  const frame = new THREE.Mesh(new THREE.PlaneGeometry(art.w, art.h), mat(art.c, 0.9));
-  frame.position.set(art.x, art.y, 0.06);
-  const border = new THREE.Mesh(new THREE.PlaneGeometry(art.w + 0.12, art.h + 0.12), mat(0x826e5a, 0.6));
-  border.position.set(art.x, art.y, 0.03);
-  wallGroup.add(border);
-  wallGroup.add(frame);
+// Slatted Acoustic Oak Screen / Japanese Shoji Screens behind Left & Right
+const createSlatPartition = (posX, width) => {
+  const slatGroup = new THREE.Group();
+  slatGroup.position.set(posX, -0.5, 0.1);
+  const backPanel = new THREE.Mesh(new THREE.BoxGeometry(width, 10.5, 0.1), warmAcousticFeltMat);
+  slatGroup.add(backPanel);
+  const numSlats = Math.floor(width / 0.45);
+  for (let s = 0; s < numSlats; s++) {
+    const sx = -width / 2 + 0.25 + s * 0.45;
+    const slat = new THREE.Mesh(new THREE.BoxGeometry(0.12, 10.5, 0.14), richHoneyOakMat);
+    slat.position.set(sx, 0, 0.08);
+    slat.castShadow = true;
+    slatGroup.add(slat);
+  }
+  return slatGroup;
+};
+wallGroup.add(createSlatPartition(-18, 7.5));
+wallGroup.add(createSlatPartition(18, 7.5));
+
+// Architectural Pinboards, Sketch Plans & Framed Concept Art
+const pinboardsData = [
+  { x: -11.5, y: 1.5, w: 4.8, h: 4.0, bg: pinboardMat },
+  { x: 3.5, y: 2.0, w: 6.2, h: 4.5, bg: warmAcousticFeltMat },
+  { x: 11.5, y: 1.0, w: 3.8, h: 3.6, bg: pinboardMat }
+];
+pinboardsData.forEach((pb) => {
+  const board = new THREE.Mesh(new THREE.BoxGeometry(pb.w, pb.h, 0.12), pb.bg);
+  board.position.set(pb.x, pb.y, 0.1);
+  board.receiveShadow = true;
+  wallGroup.add(board);
+
+  // Pin various sketch sheets onto the board
+  const sheetsCount = 4;
+  for (let sc = 0; sc < sheetsCount; sc++) {
+    const sw = 1.0 + Math.random() * 0.6;
+    const sh = 1.2 + Math.random() * 0.5;
+    const sheet = new THREE.Mesh(new THREE.PlaneGeometry(sw, sh), sc % 2 === 0 ? paperMat : paperDraftMat);
+    const sx = pb.x - pb.w / 2 + 0.8 + sc * (pb.w / sheetsCount);
+    const sy = pb.y - 0.5 + (sc % 2) * 1.0;
+    sheet.position.set(sx, sy, 0.18);
+    sheet.rotation.z = (Math.random() - 0.5) * 0.08;
+    wallGroup.add(sheet);
+  }
 });
+
+// Single Modern Minimalist Art Frame on Far Left (like in the drawing)
+const artFrame = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 3.2), mat(0x282624, 0.5));
+artFrame.position.set(-22, 3.5, 0.08);
+const artInner = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.9), mat(0xd3c4b0, 0.9));
+artInner.position.set(-22, 3.5, 0.1);
+wallGroup.add(artFrame);
+wallGroup.add(artInner);
+
+// Floating Architectural Oak Shelving with Books and Ceramics
+const shelf1 = new THREE.Mesh(new THREE.BoxGeometry(11, 0.15, 1.2), richHoneyOakMat);
+shelf1.position.set(-4, 5.8, 0.6);
+shelf1.castShadow = true;
+wallGroup.add(shelf1);
+
+// Books & decor objects on shelf
+for (let b = 0; b < 12; b++) {
+  const bookColors = [0x544538, 0x8f483c, 0xd4c7b5, 0x363e46, 0xbf9b7a];
+  const bMat = mat(bookColors[b % bookColors.length], 0.8);
+  const book = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.85 + (b % 3) * 0.2, 0.65), bMat);
+  book.position.set(-8.5 + b * 0.25, 6.35 + (b % 3) * 0.1, 0.6);
+  book.castShadow = true;
+  wallGroup.add(book);
+}
+
+// Minimalist Ceramic Vases on Shelf
+const vase1 = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 1.1, 16), mat(0xe8dfd2, 0.4));
+vase1.position.set(0.5, 6.4, 0.6);
+vase1.castShadow = true;
+wallGroup.add(vase1);
+
 scene.add(wallGroup);
 
-// Espresso & Coffee Counter (Shifted left to -15.5 to avoid overlapping table)
+// --- 5. Coffee Station & Lounge Counter (Left Corner) ---
 const coffeeStation = new THREE.Group();
-coffeeStation.position.set(-15.5, 0, -1.0);
+coffeeStation.position.set(-16.5, 0, -0.8);
 
-const counterTable = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.5, 2.0), richHoneyOakMat);
+const counterTable = new THREE.Mesh(new THREE.BoxGeometry(3.8, 2.5, 2.2), warmCabinetBeigeMat);
 counterTable.position.set(0, 1.25, 0);
 counterTable.castShadow = true;
 counterTable.receiveShadow = true;
 coffeeStation.add(counterTable);
 
-const espressoBody = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.0, 1.0), mat(0x22201e, 0.3, 0.5));
-espressoBody.position.set(-0.5, 3.0, 0);
+const counterTopWood = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.14, 2.4), richHoneyOakMat);
+counterTopWood.position.set(0, 2.55, 0);
+counterTopWood.castShadow = true;
+coffeeStation.add(counterTopWood);
+
+const espressoBody = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.0, 1.1), mat(0x282624, 0.35, 0.4));
+espressoBody.position.set(-0.6, 3.1, 0);
 espressoBody.castShadow = true;
 coffeeStation.add(espressoBody);
 
 for (let c = 0; c < 3; c++) {
-  const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.22, 16), coffeeCupMat);
-  cup.position.set(0.6 + c * 0.35, 2.61, 0.2);
+  const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.1, 0.24, 16), coffeeCupMat);
+  cup.position.set(0.6 + c * 0.35, 2.75, 0.2);
   cup.castShadow = true;
   coffeeStation.add(cup);
 }
 
-const plantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.32, 0.85, 16), mat(0xb85d38, 0.8));
-plantPot.position.set(-2.2, 0.42, 0.2);
-plantPot.castShadow = true;
-const plantFoliage = new THREE.Mesh(new THREE.DodecahedronGeometry(0.72), plantGreenMat);
-plantFoliage.position.set(-2.2, 1.2, 0.2);
+// Lush Architectural Planter with Ceramic Fluted Pot
+const planterPot = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.5, 1.4, 20), mat(0xd4c7b5, 0.6));
+planterPot.position.set(-2.4, 0.7, 0.4);
+planterPot.castShadow = true;
+const plantFoliage = new THREE.Mesh(new THREE.DodecahedronGeometry(1.05), plantGreenMat);
+plantFoliage.position.set(-2.4, 2.0, 0.4);
 plantFoliage.castShadow = true;
-coffeeStation.add(plantPot);
+coffeeStation.add(planterPot);
 coffeeStation.add(plantFoliage);
 
 scene.add(coffeeStation);
 
-// --- 5. Long Executive Oak Studio Table ---
+// --- 6. Extended Shared Studio Bench Desk (Accurate Proportions from Drawing) ---
 const tableGroup = new THREE.Group();
 tableGroup.position.set(0, 0, 0);
 
-const tableLength = 22;
-const tableDepth = 3.0;
+const tableLength = 26; // Extended length for spacious, uncluttered feel
+const tableDepth = 3.2;
 const tableHeight = 2.6;
 
-const tableTop = new THREE.Mesh(new THREE.BoxGeometry(tableLength, 0.22, tableDepth), whiteDeskMat);
+// Slim Crisp White Studio Top with Pale Honey Oak Bevel Edge
+const tableTop = new THREE.Mesh(new THREE.BoxGeometry(tableLength, 0.16, tableDepth), whiteDeskMat);
 tableTop.position.set(0, tableHeight, 0);
 tableTop.castShadow = true;
 tableTop.receiveShadow = true;
 tableGroup.add(tableTop);
 
-const tableEdge = new THREE.Mesh(new THREE.BoxGeometry(tableLength, 0.08, tableDepth + 0.06), richHoneyOakMat);
-tableEdge.position.set(0, tableHeight - 0.12, 0);
-tableGroup.add(tableEdge);
+const tableEdgeTrim = new THREE.Mesh(new THREE.BoxGeometry(tableLength + 0.04, 0.08, tableDepth + 0.06), richHoneyOakMat);
+tableEdgeTrim.position.set(0, tableHeight - 0.1, 0);
+tableGroup.add(tableEdgeTrim);
 
-const legX = [-10.5, -5.2, 0, 5.2, 10.5];
+// Refined Architectural Black Steel Legs (Slimmer, elegant studio trestles)
+const legX = [-12.2, -6.2, 0, 6.2, 12.2];
 legX.forEach((lx) => {
-  const l1 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, tableHeight, 16), steelLegMat);
-  l1.position.set(lx, tableHeight / 2, -tableDepth / 2 + 0.25);
+  const l1 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, tableHeight, 16), steelLegMat);
+  l1.position.set(lx, tableHeight / 2, -tableDepth / 2 + 0.3);
   l1.castShadow = true;
   tableGroup.add(l1);
 
-  const l2 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, tableHeight, 16), steelLegMat);
-  l2.position.set(lx, tableHeight / 2, tableDepth / 2 - 0.25);
+  const l2 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, tableHeight, 16), steelLegMat);
+  l2.position.set(lx, tableHeight / 2, tableDepth / 2 - 0.3);
   l2.castShadow = true;
   tableGroup.add(l2);
+
+  // Cross horizontal foot rail
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, tableDepth - 0.6), steelLegMat);
+  rail.position.set(lx, 0.35, 0);
+  tableGroup.add(rail);
 });
 
-const drawersX = [-8.5, -0.2, 7.8];
-drawersX.forEach((dx) => {
-  const cabinet = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.0, 2.2), richHoneyOakMat);
-  cabinet.position.set(dx, 1.0, 0);
-  cabinet.castShadow = true;
-  cabinet.receiveShadow = true;
-  tableGroup.add(cabinet);
+// Architectural Modular Drawer Pedestals & Storage Boxes (Right under table like in reference)
+const cabinetsData = [
+  { x: -10.2, w: 2.4, h: 2.1, d: 2.4, mat: warmCabinetBeigeMat },
+  { x: -1.2, w: 2.2, h: 2.1, d: 2.4, mat: warmCabinetBeigeMat },
+  { x: 4.8, w: 2.4, h: 2.1, d: 2.4, mat: naturalOakMat },
+  { x: 9.8, w: 2.2, h: 2.1, d: 2.4, mat: warmCabinetBeigeMat }
+];
+cabinetsData.forEach((cab) => {
+  const box = new THREE.Mesh(new THREE.BoxGeometry(cab.w, cab.h, cab.d), cab.mat);
+  box.position.set(cab.x, cab.h / 2, -0.15);
+  box.castShadow = true;
+  box.receiveShadow = true;
+  tableGroup.add(box);
+
+  // Subtle horizontal drawer seam grooves
+  for (let g = 1; g <= 3; g++) {
+    const seam = new THREE.Mesh(new THREE.BoxGeometry(cab.w - 0.1, 0.02, 0.04), mat(0x42382e, 0.5));
+    seam.position.set(cab.x, (cab.h / 4) * g, cab.d / 2 - 0.1);
+    tableGroup.add(seam);
+  }
 });
 
-// Desktops: Dual Monitors, Laptops, Lamps
-const agentX = [-6.8, -2.2, 2.6, 7.2];
+// Cardboard Storage Archive Boxes & Rolled Drafting Tubes on the floor (From drawing)
+const floorProps = [
+  { x: -7.6, z: 1.8, w: 1.6, h: 1.1, d: 1.4, c: 0xcdbda4 },
+  { x: 2.8, z: 1.9, w: 1.8, h: 1.3, d: 1.5, c: 0xc4b39b },
+  { x: 11.8, z: 1.9, w: 1.5, h: 1.0, d: 1.3, c: 0xcbb9a3 }
+];
+floorProps.forEach((fp) => {
+  const box = new THREE.Mesh(new THREE.BoxGeometry(fp.w, fp.h, fp.d), mat(fp.c, 0.9));
+  box.position.set(fp.x, fp.h / 2, fp.z);
+  box.rotation.y = (Math.random() - 0.5) * 0.2;
+  box.castShadow = true;
+  box.receiveShadow = true;
+  tableGroup.add(box);
+});
+
+// Desktops: High-End Frameless Monitors, Sleek Laptops, Anglepoise Drafting Lamps
+const agentX = [-7.6, -2.6, 2.6, 7.6];
 const deskSpots = [];
 
 agentX.forEach((wx, i) => {
-  if (i === 0 || i === 2) {
-    const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.16, 0.5, 16), steelLegMat);
-    stand.position.set(wx, tableHeight + 0.25, -0.4);
-    const screenFrame = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.05, 0.08), mat(0x22201e, 0.3));
-    screenFrame.position.set(wx, tableHeight + 0.78, -0.4);
+  if (i === 0 || i === 3) {
+    // Ultra-slim minimalist studio displays (silver + clean glass pane)
+    const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.14, 0.6, 16), steelLegMat);
+    stand.position.set(wx, tableHeight + 0.3, -0.45);
+    const screenFrame = new THREE.Mesh(new THREE.BoxGeometry(1.85, 1.15, 0.04), mat(0x282624, 0.2));
+    screenFrame.position.set(wx, tableHeight + 0.88, -0.45);
     screenFrame.castShadow = true;
-    const screenInner = new THREE.Mesh(new THREE.PlaneGeometry(1.48, 0.92), new THREE.MeshBasicMaterial({ color: 0xf5f8fc }));
-    screenInner.position.set(wx, tableHeight + 0.78, -0.35);
+    const screenInner = new THREE.Mesh(new THREE.PlaneGeometry(1.78, 1.08), new THREE.MeshBasicMaterial({ color: 0xf6f8fc }));
+    screenInner.position.set(wx, tableHeight + 0.88, -0.42);
     tableGroup.add(stand);
     tableGroup.add(screenFrame);
     tableGroup.add(screenInner);
   } else {
-    const base = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.04, 0.65), mat(0x33302c, 0.3));
-    base.position.set(wx, tableHeight + 0.12, -0.1);
-    const lid = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.58, 0.03), mat(0x33302c, 0.3));
-    lid.position.set(wx, tableHeight + 0.38, -0.4);
-    lid.rotation.x = -0.22;
+    // Elegant open MacBook / slim workstation
+    const base = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.03, 0.65), mat(0xd4d8dc, 0.2, 0.6));
+    base.position.set(wx, tableHeight + 0.09, -0.15);
+    const lid = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.62, 0.02), mat(0xd4d8dc, 0.2, 0.6));
+    lid.position.set(wx, tableHeight + 0.36, -0.46);
+    lid.rotation.x = -0.25;
     tableGroup.add(base);
     tableGroup.add(lid);
   }
 
-  // Modern Desk Lamp
+  // Classic Anglepoise Drafting Architect Lamp (from reference drawing)
+  const lampGroup = new THREE.Group();
+  lampGroup.position.set(wx + 1.25, tableHeight + 0.08, -0.7);
   const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.04, 16), steelLegMat);
-  lampBase.position.set(wx + 1.1, tableHeight + 0.12, -0.65);
-  const lampPole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.1, 16), steelLegMat);
-  lampPole.position.set(wx + 1.1, tableHeight + 0.65, -0.65);
-  lampPole.rotation.z = -0.25;
-  const lampHead = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.3, 16), steelLegMat);
-  lampHead.position.set(wx + 0.88, tableHeight + 1.1, -0.65);
-  lampHead.rotation.z = 0.5;
-  tableGroup.add(lampBase);
-  tableGroup.add(lampPole);
-  tableGroup.add(lampHead);
+  lampGroup.add(lampBase);
+  const arm1 = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.9, 12), steelLegMat);
+  arm1.position.set(0, 0.42, 0);
+  arm1.rotation.z = -0.3;
+  lampGroup.add(arm1);
+  const arm2 = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.8, 12), steelLegMat);
+  arm2.position.set(-0.25, 0.95, 0);
+  arm2.rotation.z = 0.55;
+  lampGroup.add(arm2);
+  const shade = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.35, 16), steelLegMat);
+  shade.position.set(-0.55, 1.2, 0);
+  shade.rotation.z = 1.1;
+  lampGroup.add(shade);
+  tableGroup.add(lampGroup);
 
-  const spot = new THREE.PointLight(atmospherePresets.day.deskSpotColor, atmospherePresets.day.deskSpotInt, 5.5);
-  spot.position.set(wx + 0.85, tableHeight + 1.0, -0.45);
+  // Warm focused task spotlight
+  const spot = new THREE.PointLight(atmospherePresets.day.deskSpotColor, atmospherePresets.day.deskSpotInt, 6.0);
+  spot.position.set(wx + 0.7, tableHeight + 1.2, -0.4);
   tableGroup.add(spot);
   deskSpots.push(spot);
 
-  const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.09, 0.2, 16), coffeeCupMat);
-  mug.position.set(wx - 0.75, tableHeight + 0.2, -0.1);
+  // Clean Ceramic Espresso / Tea Mug
+  const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.09, 0.22, 16), coffeeCupMat);
+  mug.position.set(wx - 0.85, tableHeight + 0.18, -0.15);
   mug.castShadow = true;
   tableGroup.add(mug);
+
+  // Neatly organized paper sketches & note stack
+  const paperStack = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.04, 0.85), paperMat);
+  paperStack.position.set(wx + 0.85, tableHeight + 0.09, 0.2);
+  paperStack.rotation.y = 0.08;
+  tableGroup.add(paperStack);
 });
 
-// Centerpiece: Crystal Nano Aquarium
+// Centerpiece: Crystal Nano Aquascape Aquarium (High-Transparency Float Glass)
 const nanoAquarium = new THREE.Group();
-nanoAquarium.position.set(0.2, tableHeight + 0.75, -0.3);
+nanoAquarium.position.set(0, tableHeight + 0.75, -0.4);
 
 const aqGlass = new THREE.Mesh(
-  new THREE.BoxGeometry(2.0, 1.2, 1.2),
-  new THREE.MeshPhysicalMaterial({ color: 0x99f6e4, transmission: 0.92, transparent: true, roughness: 0.03, ior: 1.33 })
+  new THREE.BoxGeometry(2.4, 1.25, 1.25),
+  new THREE.MeshPhysicalMaterial({ color: 0xa7f3d0, transmission: 0.94, transparent: true, roughness: 0.02, ior: 1.33 })
 );
 nanoAquarium.add(aqGlass);
 
 const aqWater = new THREE.Mesh(
-  new THREE.BoxGeometry(1.85, 1.05, 1.05),
-  new THREE.MeshStandardMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.22 })
+  new THREE.BoxGeometry(2.25, 1.1, 1.1),
+  new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.2 })
 );
 nanoAquarium.add(aqWater);
 
-const moss = new THREE.Mesh(new THREE.DodecahedronGeometry(0.22), plantGreenMat);
-moss.position.set(-0.4, -0.4, 0);
+// Aquascaped Dragon Stone & Mini Foliage
+const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.35), mat(0x524e49, 0.85));
+rock.position.set(0.1, -0.3, 0);
+nanoAquarium.add(rock);
+
+const moss = new THREE.Mesh(new THREE.DodecahedronGeometry(0.24), plantGreenMat);
+moss.position.set(-0.45, -0.35, 0.1);
 nanoAquarium.add(moss);
 
 const nanoFishes = [];
-for (let f = 0; f < 3; f++) {
-  const fish = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.18, 6), mat(f === 0 ? 0x00e5ff : 0xff3b30, 0.3));
+for (let f = 0; f < 4; f++) {
+  const fish = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.16, 6), mat(f % 2 === 0 ? 0x00e5ff : 0xff453a, 0.3));
   fish.rotation.z = Math.PI / 2;
   nanoAquarium.add(fish);
-  nanoFishes.push({ mesh: fish, angle: f * 2.1, speed: 0.02 + f * 0.005, rad: 0.5 + f * 0.15, y: -0.15 + f * 0.15 });
+  nanoFishes.push({ mesh: fish, angle: f * 1.57, speed: 0.02 + f * 0.006, rad: 0.6 + f * 0.12, y: -0.15 + (f % 2) * 0.2 });
 }
 tableGroup.add(nanoAquarium);
 
 scene.add(tableGroup);
 
-// --- 6. Ergonomic Task Chairs (Placed at z = 1.35, facing -Z towards table) ---
+// --- 7. Ergonomic Task Chairs (Facing -Z towards table) ---
 function createErgonomicChair(x, z, chairMat) {
   const group = new THREE.Group();
   group.position.set(x, 0, z);
 
-  // Wheels Base
+  // 5-Star Wheels Base
   const base = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.65, 0.12, 8), steelLegMat);
   base.position.y = 0.2;
   group.add(base);
@@ -324,15 +483,15 @@ function createErgonomicChair(x, z, chairMat) {
   column.position.y = 0.75;
   group.add(column);
 
-  // Cushion Seat
-  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.2, 1.3), chairMat);
-  seat.position.y = 1.35; // Cushion top at y = 1.45
+  // Soft Cushion Seat
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.22, 1.35), chairMat);
+  seat.position.y = 1.35; // Cushion top at y = 1.46
   seat.castShadow = true;
   group.add(seat);
 
-  // Ergonomic Curved Mesh Back (at +Z so chair faces -Z towards desk)
-  const back = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.5, 0.16), chairMat);
-  back.position.set(0, 2.15, 0.58);
+  // Ergonomic Curved Mesh Back
+  const back = new THREE.Mesh(new THREE.BoxGeometry(1.25, 1.55, 0.16), chairMat);
+  back.position.set(0, 2.18, 0.6);
   back.rotation.x = -0.06;
   back.castShadow = true;
   group.add(back);
@@ -342,7 +501,7 @@ function createErgonomicChair(x, z, chairMat) {
 
 const chairs = [
   createErgonomicChair(agentX[0], 1.35, navyFabricMat),
-  createErgonomicChair(agentX[1], 1.35, tealFabricMat),
+  createErgonomicChair(agentX[1], 1.35, rustFabricMat),
   createErgonomicChair(agentX[2], 1.35, tealFabricMat),
   createErgonomicChair(agentX[3], 1.35, navyFabricMat)
 ];
@@ -488,10 +647,14 @@ function createDetailedHumanoid(cfg) {
 }
 
 const agentConfigs = [
-  { id: "strategist", deskX: agentX[0], outfit: 0x363330, innerShirt: 0xf5f5f5, pants: 0xb5a48b, hair: 0x1f1d1b, isWoman: false, hasGlasses: true, name: "Strategist" },
-  { id: "scriptwriter", deskX: agentX[1], outfit: 0xa14332, innerShirt: 0x222222, pants: 0x242424, hair: 0x804d2e, isWoman: true, hasGlasses: false, name: "Scriptwriter" },
-  { id: "shotDirector", deskX: agentX[2], outfit: 0x6e6558, innerShirt: 0xffffff, pants: 0x2b2b2b, hair: 0x22201e, isWoman: false, hasGlasses: false, name: "Shot Director" },
-  { id: "qaEvaluator", deskX: agentX[3], outfit: 0xb5a695, innerShirt: 0x3a4b4c, pants: 0x1f1f1f, hair: 0x3d3025, isWoman: false, hasGlasses: true, name: "QA Auditor" }
+  // 1. Strategist (Far Left): Dark Charcoal Blazer / Khaki Trousers / Sleek Glasses
+  { id: "strategist", deskX: agentX[0], outfit: 0x33302c, innerShirt: 0xf5f3ee, pants: 0xb5a794, hair: 0x221f1d, isWoman: false, hasGlasses: true, name: "Strategist" },
+  // 2. Scriptwriter (Mid Left): Japanese Terracotta Rust Cardigan / Black Slacks / Layered Hair
+  { id: "scriptwriter", deskX: agentX[1], outfit: 0x8a4537, innerShirt: 0x242220, pants: 0x2b2825, hair: 0x6e4732, isWoman: true, hasGlasses: false, name: "Scriptwriter" },
+  // 3. Shot Director (Mid Right): Warm Sand/Camel Beige Coat / Cream Top / Dark Denim
+  { id: "shotDirector", deskX: agentX[2], outfit: 0xbaab97, innerShirt: 0xf9f7f2, pants: 0x363e46, hair: 0x2a2724, isWoman: false, hasGlasses: false, name: "Shot Director" },
+  // 4. QA Auditor (Far Right): Japanese Muted Olive / Sage Green Overcoat / Minimalist Frames
+  { id: "qaEvaluator", deskX: agentX[3], outfit: 0x6b6d57, innerShirt: 0x383531, pants: 0x262422, hair: 0x3b332a, isWoman: false, hasGlasses: true, name: "QA Auditor" }
 ];
 
 const agents = agentConfigs.map((cfg) => {
