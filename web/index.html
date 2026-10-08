@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🐠 3D Minimal AI Agent Office | Fish Shop TikTok Creator</title>
+  <title>Aquatic Creator Studio | Multi-Agent Production HQ</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b5c5e' stroke-width='2'><path d='M2 12c5.5-4 10-4 15.5 0-5.5 4-10 4-15.5 0z'/><circle cx='6' cy='12' r='1'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <!-- Three.js and OrbitControls for 3D Minimal Niche Platform -->
+  <!-- Three.js and OrbitControls -->
   <script src="three.min.js"></script>
   <script src="OrbitControls.js"></script>
 </head>
@@ -17,69 +18,97 @@
     <!-- Top Navigation -->
     <header class="top-nav">
       <div class="brand">
-        <div class="brand-badge">
-          <span class="pulse-dot"></span>
-          <span>3D MINIMAL NICHE HQ</span>
+        <div class="brand-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12c5.5-4 10-4 15.5 0-5.5 4-10 4-15.5 0z"/>
+            <circle cx="6" cy="12" r="1" fill="currentColor"/>
+          </svg>
         </div>
-        <h1>🐠 Aquatic AI Creator Team</h1>
+        <div class="brand-info">
+          <h1>AQUATIC STUDIO HQ</h1>
+          <span class="brand-subtitle">Autonomous Content Creator Team</span>
+        </div>
       </div>
-      <div class="office-controls-hint">
-        <span class="hint-tag">🖱️ คลิกหมุน 3D ได้ 360° / สกรอลล์ซูม</span>
+
+      <div class="nav-center-hint">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 8v8M8 12h8"/>
+        </svg>
+        <span>Interactive 3D Studio &bull; Drag to Rotate &bull; Scroll to Zoom</span>
       </div>
+
       <div class="office-stats">
-        <div class="stat-pill"><span class="icon">🤖</span> 4 Agents Active</div>
-        <div class="stat-pill"><span class="icon">🎬</span> Real Filming Mode</div>
+        <div class="stat-pill">
+          <span class="pulse-dot"></span>
+          <span>4 Agents Online</span>
+        </div>
+        <div class="stat-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="23 7 16 12 23 17 23 7"/>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+          <span>Production Ready</span>
+        </div>
       </div>
     </header>
 
     <!-- Main Workspace Grid -->
     <main class="main-content">
-      <!-- Left Column: 3D Minimal Office Viewport -->
+      <!-- Left Column: 3D Architectural Studio Viewport -->
       <section class="simulation-pane">
         <div class="pane-header">
           <div class="header-title">
-            <span class="room-icon">🏢</span>
-            <h2>3D Minimalist Office Simulation</h2>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="9" y1="21" x2="9" y2="9"/>
+            </svg>
+            <h2>Architectural Studio Simulation</h2>
           </div>
           <div class="room-legend">
-            <span class="badge badge-strategist">🧠 Strategist</span>
-            <span class="badge badge-scriptwriter">✍️ Scriptwriter</span>
-            <span class="badge badge-shot">🎬 Shot Director</span>
-            <span class="badge badge-qa">📊 QA Auditor</span>
+            <span class="badge badge-strategist">Strategist</span>
+            <span class="badge badge-scriptwriter">Scriptwriter</span>
+            <span class="badge badge-shot">Shot Director</span>
+            <span class="badge badge-qa">QA Auditor</span>
           </div>
         </div>
 
         <!-- WebGL 3D Container -->
         <div class="office-viewport" id="threeContainer">
-          <!-- Speech Bubbles Overlay -->
-          <div id="bubbleOverlay" class="bubble-overlay"></div>
-
           <!-- Live Activity Bar -->
           <div class="live-activity-bar" id="activityBar">
-            <div class="agent-avatar-mini" id="activeAgentMini">🧠</div>
-            <div class="activity-text">
-              <strong id="activeAgentName">Strategist Agent</strong>
-              <span id="activityStatus">กำลังสแกนหาประเด็นที่คนเลี้ยงปลาสงสัย...</span>
+            <div class="agent-avatar-mini" id="activeAgentMini">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+              </svg>
             </div>
-            <div class="activity-spinner"></div>
+            <div class="activity-text">
+              <strong id="activeAgentName">Creative Team Ready</strong>
+              <span id="activityStatus">Team members working, brewing coffee, and researching fish care insights...</span>
+            </div>
+            <div class="activity-spinner" id="activeSpinner"></div>
           </div>
         </div>
 
         <!-- Quick Prompt / Topic Controller -->
         <div class="control-console">
-          <div class="console-label">🎯 เลือกโจทย์สร้างคลิป TikTok สำหรับร้านปลาของคุณ:</div>
+          <div class="console-label">Select Content Topic for Production:</div>
           <div class="preset-chips">
-            <button class="chip active" data-topic="ทำไมปลานีออนไม่ยอมว่ายรวมฝูง และวิธีแก้">🐟 นีออนไม่รวมฝูง</button>
-            <button class="chip" data-topic="3 ความเข้าใจผิดในการเลี้ยงปลากัด ที่ทำให้ปลาป่วย">🥊 ปลากัดเลี้ยงผิดวิธี</button>
-            <button class="chip" data-topic="วิธีแก้น้ำขุ่นในตู้ปลาให้ใสวิ้ง ไม่ต้องล้างบ่อย">💧 แก้น้ำขุ่นถาวร</button>
-            <button class="chip" data-topic="จัดตู้ปลามินิมอลบนโต๊ะทำงาน สวยคลีน สบายตา">🌿 จัดตู้มินิมอลบนโต๊ะ</button>
+            <button class="chip active" data-topic="ทำไมปลานีออนไม่ยอมว่ายรวมฝูง และวิธีแก้">ปลานีออนไม่รวมฝูง</button>
+            <button class="chip" data-topic="3 ความเข้าใจผิดในการเลี้ยงปลากัด ที่ทำให้ปลาป่วย">ความลับการเลี้ยงปลากัด</button>
+            <button class="chip" data-topic="วิธีแก้น้ำขุ่นในตู้ปลาให้ใสวิ้ง ไม่ต้องล้างตู้บ่อย">แก้น้ำขุ่นถาวร</button>
+            <button class="chip" data-topic="จัดตู้ปลามินิมอลบนโต๊ะทำงาน สวยคลีน สบายตา">จัดตู้มินิมอลบนโต๊ะ</button>
           </div>
 
           <form id="generateForm" class="input-group">
-            <input type="text" id="topicInput" placeholder="พิมพ์ชื่อปลา หรือ ปัญหาที่ต้องการถ่ายคลิป..." value="ทำไมปลานีออนไม่ยอมว่ายรวมฝูง และวิธีแก้" required>
+            <input type="text" id="topicInput" placeholder="Enter fish species or topic (e.g. กุ้งแคระลอกคราบ, ปลานีออน)..." value="ทำไมปลานีออนไม่ยอมว่ายรวมฝูง และวิธีแก้" required>
             <button type="submit" id="startBtn" class="btn-primary">
-              <span class="btn-icon">⚡</span>
-              <span>สั่ง Agent เริ่มทำงาน</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              <span>Execute Agents</span>
             </button>
           </form>
         </div>
@@ -89,24 +118,48 @@
       <section class="output-pane">
         <div class="pane-header">
           <div class="header-title">
-            <span class="room-icon">🎬</span>
-            <h2>TikTok Production Sheet (บทพากย์ & มุมกล้อง)</h2>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <h2>Production Sheet & Shot List</h2>
           </div>
           <div class="action-buttons">
-            <button id="copyAllBtn" class="btn-outline btn-sm">📋 Copy All</button>
-            <button id="downloadMdBtn" class="btn-outline btn-sm">📥 Export .JSON</button>
+            <button id="copyAllBtn" class="btn-outline btn-sm">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              <span>Copy All</span>
+            </button>
+            <button id="downloadMdBtn" class="btn-outline btn-sm">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Export JSON</span>
+            </button>
           </div>
         </div>
 
         <div class="output-scrollable" id="outputContainer">
           <!-- Placeholder state -->
           <div class="empty-state" id="emptyState">
-            <div class="empty-icon">🐠</div>
-            <h3>พร้อมสร้างไอเดีย & บทพากย์สำหรับถ่ายคลิปจริง</h3>
-            <p>กดปุ่ม <strong>"สั่ง Agent เริ่มทำงาน"</strong> เพื่อดูตัวการ์ตูน 3D ในออฟฟิศเดินไปทำงานตามแผนกต่างๆ แล้วสร้างบทพากย์ + ไกด์มุมกล้องให้ทันที</p>
+            <div class="empty-graphic">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M2 12c5.5-4 10-4 15.5 0-5.5 4-10 4-15.5 0z"/>
+                <circle cx="6" cy="12" r="1.5"/>
+                <path d="M17.5 12L22 8.5v7L17.5 12z"/>
+              </svg>
+            </div>
+            <h3>Autonomous Studio Ready</h3>
+            <p>Select a topic and click <strong>"Execute Agents"</strong> to watch the 3D team simulate research, scriptwriting, shot planning, and quality audit in real time.</p>
           </div>
 
-          <!-- Live Result Cards (Hidden by default) -->
+          <!-- Live Result Cards -->
           <div class="result-content hidden" id="resultContent">
             <!-- QA Scorecard Badge -->
             <div class="qa-score-card">
@@ -116,25 +169,25 @@
                   <small>/10</small>
                 </div>
                 <div>
-                  <div class="qa-title">TikTok Algorithm Audit</div>
-                  <div class="qa-status-pass" id="qaStatusText">✅ ผ่านเกณฑ์มาตรฐานความไวรัล</div>
+                  <div class="qa-title">Algorithm Retention Audit</div>
+                  <div class="qa-status-pass" id="qaStatusText">Passed Growth & Retention Standards</div>
                 </div>
               </div>
               <div class="score-breakdown">
                 <div class="metric-item">
-                  <span>🪝 3s Hook Impact</span>
+                  <span>3s Hook Impact</span>
                   <strong id="qaHookScore">9/10</strong>
                 </div>
                 <div class="metric-item">
-                  <span>⏳ Retention Curve</span>
+                  <span>Retention Curve</span>
                   <strong id="qaRetentionScore">9/10</strong>
                 </div>
                 <div class="metric-item">
-                  <span>💬 Comment Trigger</span>
+                  <span>Comment Trigger</span>
                   <strong id="qaCommentScore">9/10</strong>
                 </div>
                 <div class="metric-item">
-                  <span>🎥 Filming Ease</span>
+                  <span>Filming Feasibility</span>
                   <strong id="qaVisualScore">10/10</strong>
                 </div>
               </div>
@@ -142,13 +195,13 @@
 
             <!-- Hook 3-Second Box -->
             <div class="hook-box">
-              <div class="hook-badge">⚡ 3-SECOND VIRAL HOOK (ประโยคเปิดคลิป)</div>
+              <div class="hook-badge">3-SECOND VIRAL HOOK</div>
               <h3 id="scriptHookText">"ทำไมปลานีออนในตู้คุณ 'ไม่ยอมว่ายเป็นฝูง'?"</h3>
             </div>
 
             <!-- Scene Breakdown Accordion -->
             <div class="scenes-section">
-              <h4>🎙️ Scene Breakdown (บทพากย์ที่คุณอ่าน & มุมกล้องที่ต้องถ่ายจริง)</h4>
+              <h4>Scene Breakdown & Camera Shot Direction</h4>
               <div id="scenesList" class="scenes-list">
                 <!-- Injected via JavaScript -->
               </div>
@@ -156,16 +209,16 @@
 
             <!-- TikTok Publishing Essentials -->
             <div class="publishing-box">
-              <h4>📝 TikTok Publishing Package</h4>
+              <h4>Publishing Package</h4>
               
               <div class="pub-item">
-                <div class="pub-label">📌 Caption (แคปชันโพสต์):</div>
+                <div class="pub-label">Caption & Hashtags:</div>
                 <div class="code-box" id="captionText"></div>
                 <button class="btn-copy-chip" onclick="copyText('captionText')">Copy Caption</button>
               </div>
 
               <div class="pub-item">
-                <div class="pub-label">💬 Pinned Comment (คำถามสำหรับปักหมุดกระตุ้นคอมเมนต์):</div>
+                <div class="pub-label">Pinned Comment (Engagement Catalyst):</div>
                 <div class="quote-box" id="pinnedCommentText"></div>
                 <button class="btn-copy-chip" onclick="copyText('pinnedCommentText')">Copy Pinned Comment</button>
               </div>

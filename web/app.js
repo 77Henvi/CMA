@@ -1,251 +1,308 @@
 /**
- * 3D Architectural Creative Studio (Three.js WebGL Engine)
- * Inspired by Japanese / Scandinavian Minimalist Studio Aesthetics
+ * Architectural Studio Simulation Engine (Three.js WebGL)
+ * Lively Human Behaviors: Coffee drinking, stretching, walking, typing, swiveling.
  */
 
 const container = document.getElementById("threeContainer");
 
 // --- 1. Three.js Scene & Camera Setup ---
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xf6f3ec); // Warm off-white from image
-scene.fog = new THREE.FogExp2(0xf6f3ec, 0.015);
+scene.background = new THREE.Color(0xded8ce); // Rich warm architectural studio tone
+scene.fog = new THREE.FogExp2(0xded8ce, 0.016);
 
-const camera = new THREE.PerspectiveCamera(34, container.clientWidth / container.clientHeight, 0.1, 1000);
-// Side-angled architectural perspective matching the reference image
-camera.position.set(0, 10, 32);
+const camera = new THREE.PerspectiveCamera(32, container.clientWidth / container.clientHeight, 0.1, 1000);
+// Framing the long shared table and coffee station comfortably
+camera.position.set(0, 9, 28);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
 renderer.setSize(container.clientWidth, container.clientHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
 container.appendChild(renderer.domElement);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.target.set(0, 3.5, 0);
+controls.target.set(0, 2.6, 0);
 controls.maxPolarAngle = Math.PI / 2.05;
-controls.minDistance = 12;
-controls.maxDistance = 55;
+controls.minDistance = 10;
+controls.maxDistance = 45;
 
-// --- 2. Warm Studio Lighting ---
-const ambientLight = new THREE.AmbientLight(0xfffbf2, 0.95);
+// --- 2. Rich Warm Studio Lighting ---
+const ambientLight = new THREE.AmbientLight(0xf5ede4, 0.85);
 scene.add(ambientLight);
 
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0xe2ded4, 0.7);
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0xc8bfb0, 0.65);
 scene.add(hemiLight);
 
-const sunLight = new THREE.DirectionalLight(0xfff6e6, 1.1);
-sunLight.position.set(12, 28, 20);
-sunLight.castShadow = true;
-sunLight.shadow.mapSize.width = 2048;
-sunLight.shadow.mapSize.height = 2048;
-sunLight.shadow.camera.near = 0.5;
-sunLight.shadow.camera.far = 70;
-sunLight.shadow.camera.left = -25;
-sunLight.shadow.camera.right = 25;
-sunLight.shadow.camera.top = 20;
-sunLight.shadow.camera.bottom = -10;
-sunLight.shadow.bias = -0.0004;
-scene.add(sunLight);
+const mainSun = new THREE.DirectionalLight(0xfffaee, 1.25);
+mainSun.position.set(16, 26, 18);
+mainSun.castShadow = true;
+mainSun.shadow.mapSize.width = 2048;
+mainSun.shadow.mapSize.height = 2048;
+mainSun.shadow.camera.near = 0.5;
+mainSun.shadow.camera.far = 60;
+mainSun.shadow.camera.left = -20;
+mainSun.shadow.camera.right = 20;
+mainSun.shadow.camera.top = 18;
+mainSun.shadow.camera.bottom = -10;
+mainSun.shadow.bias = -0.0003;
+scene.add(mainSun);
 
-// Soft backlight
-const backLight = new THREE.DirectionalLight(0xd9e2ec, 0.4);
-backLight.position.set(-15, 12, -15);
-scene.add(backLight);
+const softFill = new THREE.DirectionalLight(0xcfd8dc, 0.45);
+softFill.position.set(-18, 14, -10);
+scene.add(softFill);
 
-// --- 3. Material Palette (Matte Architectural Clay & Wood) ---
-const mat = (color, roughness = 0.65) => new THREE.MeshStandardMaterial({ color, roughness, metalness: 0.02 });
+// --- 3. High-Craft Materials Palette ---
+const mat = (color, roughness = 0.65, metalness = 0.04) =>
+  new THREE.MeshStandardMaterial({ color, roughness, metalness });
 
-const deskTopMat = mat(0xffffff, 0.3); // Sleek white studio table
-const deskWoodMat = mat(0xd7ccc8, 0.8); // Warm oak drawers
-const metalLegMat = mat(0x3e3c38, 0.4); // Charcoal steel legs
-const wallMat = mat(0xefeae1, 0.9); // Back wall
-const floorMat = mat(0xf3efe6, 0.85); // Floor
-const tealChairMat = mat(0x3b5c5e, 0.5); // Teal ergonomic chair
-const darkChairMat = mat(0x2f3640, 0.6); // Slate black chair
+const whiteDeskMat = mat(0xffffff, 0.25, 0.05);
+const warmWoodMat = mat(0xcbb195, 0.75, 0.02);
+const darkWoodMat = mat(0x5c4d3c, 0.8, 0.02);
+const steelLegMat = mat(0x2d2b28, 0.35, 0.3);
+const wallMat = mat(0xe8e2d8, 0.9, 0.0);
+const floorWoodMat = mat(0xd5cbbe, 0.8, 0.05);
+const tealFabricMat = mat(0x38595b, 0.7, 0.0);
+const slateFabricMat = mat(0x2f343b, 0.7, 0.0);
+const skinMat = mat(0xffdfc4, 0.6, 0.0);
+const plantGreenMat = mat(0x4a6b46, 0.7, 0.0);
+const coffeeCupMat = mat(0xfbfbfb, 0.3, 0.0);
 
-// --- 4. Architectural Back Wall & Moodboards ---
+// --- 4. Architectural Environment Setup ---
+// Floor with soft grid texture
+const floorGeo = new THREE.PlaneGeometry(55, 35);
+const floorMesh = new THREE.Mesh(floorGeo, floorWoodMat);
+floorMesh.rotation.x = -Math.PI / 2;
+floorMesh.position.y = 0;
+floorMesh.receiveShadow = true;
+scene.add(floorMesh);
+
+// Back Wall with Moodboards & Architectural Sketches
 const wallGroup = new THREE.Group();
-wallGroup.position.set(0, 8, -5);
+wallGroup.position.set(0, 7.5, -4.8);
 
-// Main backdrop panel
-const backWall = new THREE.Mesh(new THREE.PlaneGeometry(60, 24), wallMat);
-backWall.receiveShadow = true;
-wallGroup.add(backWall);
+const wallMesh = new THREE.Mesh(new THREE.PlaneGeometry(55, 16), wallMat);
+wallMesh.receiveShadow = true;
+wallGroup.add(wallMesh);
 
-// Pinned Sketches & Frames (as seen in the reference image)
-const sketches = [
-  { x: -16, y: 3, w: 2.2, h: 2.8, color: 0xdfd7cb },
-  { x: -9, y: 4.5, w: 3.5, h: 2.5, color: 0xe6dfd5 },
-  { x: -2, y: 3.8, w: 2.8, h: 3.6, color: 0xeae4db },
-  { x: 6, y: 4.2, w: 4.5, h: 3.0, color: 0xe2dad0 },
-  { x: 14, y: 3.5, w: 3.0, h: 4.0, color: 0xdfd8cd }
+// Pinned Sketches & Art Frames (from reference drawing)
+const wallArt = [
+  { x: -14, y: 2.2, w: 2.2, h: 2.8, c: 0xd6ccbe },
+  { x: -8, y: 3.2, w: 3.4, h: 2.4, c: 0xdfd5c7 },
+  { x: -2, y: 2.8, w: 2.8, h: 3.4, c: 0xe5dcd0 },
+  { x: 5, y: 3.0, w: 4.2, h: 2.8, c: 0xdad0c2 },
+  { x: 12, y: 2.4, w: 2.6, h: 3.6, c: 0xd8cebf }
 ];
 
-sketches.forEach((s) => {
-  const f = new THREE.Mesh(new THREE.PlaneGeometry(s.w, s.h), mat(s.color, 0.9));
-  f.position.set(s.x, s.y, 0.05);
-  // Thin border
-  const border = new THREE.Mesh(new THREE.PlaneGeometry(s.w + 0.15, s.h + 0.15), mat(0x8d8276, 0.7));
-  border.position.set(s.x, s.y, 0.02);
+wallArt.forEach((art) => {
+  const frame = new THREE.Mesh(new THREE.PlaneGeometry(art.w, art.h), mat(art.c, 0.9));
+  frame.position.set(art.x, art.y, 0.06);
+  const border = new THREE.Mesh(new THREE.PlaneGeometry(art.w + 0.12, art.h + 0.12), mat(0x8c8072, 0.6));
+  border.position.set(art.x, art.y, 0.03);
   wallGroup.add(border);
-  wallGroup.add(f);
+  wallGroup.add(frame);
 });
-
 scene.add(wallGroup);
 
-// Floor
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), floorMat);
-floor.rotation.x = -Math.PI / 2;
-floor.position.y = 0;
-floor.receiveShadow = true;
-scene.add(floor);
+// Coffee & Refreshment Counter Station (on the left side)
+const coffeeStation = new THREE.Group();
+coffeeStation.position.set(-13.5, 0, -1.5);
 
-// --- 5. Long Shared Collaborative Studio Desk ---
+// Counter Table
+const counterTable = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.5, 2.0), warmWoodMat);
+counterTable.position.set(0, 1.25, 0);
+counterTable.castShadow = true;
+counterTable.receiveShadow = true;
+coffeeStation.add(counterTable);
+
+// Espresso Machine
+const espressoBody = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.0, 1.0), mat(0x2b2926, 0.3, 0.4));
+espressoBody.position.set(-0.5, 3.0, 0);
+espressoBody.castShadow = true;
+const espressoSpout = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.25), mat(0xc0c0c0, 0.2, 0.8));
+espressoSpout.position.set(-0.5, 2.4, 0.35);
+coffeeStation.add(espressoBody);
+coffeeStation.add(espressoSpout);
+
+// Coffee Cups on Counter
+for (let c = 0; c < 3; c++) {
+  const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.22, 16), coffeeCupMat);
+  cup.position.set(0.6 + c * 0.35, 2.61, 0.2);
+  cup.castShadow = true;
+  coffeeStation.add(cup);
+}
+
+// Potted Indoor Plant near Coffee Bar
+const plantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.3, 0.8, 16), mat(0xf0ece4, 0.6));
+plantPot.position.set(1.4, 0.4, 1.2);
+plantPot.castShadow = true;
+const plantFoliage = new THREE.Mesh(new THREE.DodecahedronGeometry(0.65), plantGreenMat);
+plantFoliage.position.set(1.4, 1.1, 1.2);
+plantFoliage.castShadow = true;
+coffeeStation.add(plantPot);
+coffeeStation.add(plantFoliage);
+
+scene.add(coffeeStation);
+
+// --- 5. Long Collaborative Studio Executive Desk ---
 const tableGroup = new THREE.Group();
 tableGroup.position.set(0, 0, 0);
 
-const tableLength = 26;
-const tableDepth = 3.2;
-const tableHeight = 3.0;
+const tableLength = 22;
+const tableDepth = 3.0;
+const tableHeight = 2.6;
 
-// Table Top
-const tableTop = new THREE.Mesh(new THREE.BoxGeometry(tableLength, 0.2, tableDepth), deskTopMat);
+// Solid Executive Desk Top
+const tableTop = new THREE.Mesh(new THREE.BoxGeometry(tableLength, 0.22, tableDepth), whiteDeskMat);
 tableTop.position.set(0, tableHeight, 0);
 tableTop.castShadow = true;
 tableTop.receiveShadow = true;
 tableGroup.add(tableTop);
 
-// Steel Legs along the table
-const legPositionsX = [-12.5, -6.5, 0, 6.5, 12.5];
-legPositionsX.forEach((lx) => {
-  const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, tableHeight), metalLegMat);
-  leg1.position.set(lx, tableHeight / 2, -tableDepth / 2 + 0.2);
-  leg1.castShadow = true;
-  tableGroup.add(leg1);
+// Beveled Warm Oak Edge
+const tableEdge = new THREE.Mesh(new THREE.BoxGeometry(tableLength, 0.08, tableDepth + 0.06), warmWoodMat);
+tableEdge.position.set(0, tableHeight - 0.12, 0);
+tableGroup.add(tableEdge);
 
-  const leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, tableHeight), metalLegMat);
-  leg2.position.set(lx, tableHeight / 2, tableDepth / 2 - 0.2);
-  leg2.castShadow = true;
-  tableGroup.add(leg2);
+// Steel Frame & Legs
+const legX = [-10.5, -5.2, 0, 5.2, 10.5];
+legX.forEach((lx) => {
+  const l1 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, tableHeight, 16), steelLegMat);
+  l1.position.set(lx, tableHeight / 2, -tableDepth / 2 + 0.25);
+  l1.castShadow = true;
+  tableGroup.add(l1);
+
+  const l2 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, tableHeight, 16), steelLegMat);
+  l2.position.set(lx, tableHeight / 2, tableDepth / 2 - 0.25);
+  l2.castShadow = true;
+  tableGroup.add(l2);
 });
 
-// Under-desk Cabinet Drawers (Warm Wood/Beige as in reference)
-const drawerPositionsX = [-10, -1, 8.5];
-drawerPositionsX.forEach((dx) => {
-  const cabinet = new THREE.Mesh(new THREE.BoxGeometry(2.4, 2.2, 2.4), deskWoodMat);
-  cabinet.position.set(dx, 1.1, 0);
+// Under-desk Storage Cabinets (as in reference image)
+const drawersX = [-8.5, -0.2, 7.8];
+drawersX.forEach((dx) => {
+  const cabinet = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.0, 2.2), warmWoodMat);
+  cabinet.position.set(dx, 1.0, 0);
   cabinet.castShadow = true;
   cabinet.receiveShadow = true;
   tableGroup.add(cabinet);
 });
 
-// Desktop Monitors & Laptops
-const laptopMat = mat(0x3a3834, 0.3);
-const monitorMat = mat(0x2b2926, 0.2);
-const screenGlowMat = new THREE.MeshBasicMaterial({ color: 0xf0f6fc });
+// Workstations: Monitors, Laptops, Desk Lamps, Notebooks
+const agentX = [-6.8, -2.2, 2.6, 7.2];
+const deskSpots = [];
 
-const workstationX = [-8, -2.5, 3.5, 9];
-
-workstationX.forEach((wx, i) => {
-  // Laptop / Monitor
+agentX.forEach((wx, i) => {
   if (i === 0 || i === 2) {
-    // Sleek Desktop Monitor
-    const monStand = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.15, 0.6), metalLegMat);
-    monStand.position.set(wx, tableHeight + 0.3, -0.4);
-    const monScreen = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.1, 0.08), monitorMat);
-    monScreen.position.set(wx, tableHeight + 0.9, -0.4);
-    monScreen.castShadow = true;
-    const innerScreen = new THREE.Mesh(new THREE.PlaneGeometry(1.45, 0.95), screenGlowMat);
-    innerScreen.position.set(wx, tableHeight + 0.9, -0.35);
-    tableGroup.add(monStand);
-    tableGroup.add(monScreen);
-    tableGroup.add(innerScreen);
+    // Large Desktop Monitor
+    const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.16, 0.5, 16), steelLegMat);
+    stand.position.set(wx, tableHeight + 0.25, -0.4);
+    const screenFrame = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.05, 0.08), mat(0x292825, 0.3));
+    screenFrame.position.set(wx, tableHeight + 0.78, -0.4);
+    screenFrame.castShadow = true;
+    const screenInner = new THREE.Mesh(new THREE.PlaneGeometry(1.48, 0.92), new THREE.MeshBasicMaterial({ color: 0xf5f8fc }));
+    screenInner.position.set(wx, tableHeight + 0.78, -0.35);
+    tableGroup.add(stand);
+    tableGroup.add(screenFrame);
+    tableGroup.add(screenInner);
   } else {
-    // Open Laptop
-    const base = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.04, 0.7), laptopMat);
-    base.position.set(wx, tableHeight + 0.12, 0);
-    const screen = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.65, 0.04), laptopMat);
-    screen.position.set(wx, tableHeight + 0.42, -0.32);
-    screen.rotation.x = -0.2;
+    // Open Sleek Laptop
+    const base = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.04, 0.65), mat(0x383531, 0.3));
+    base.position.set(wx, tableHeight + 0.12, -0.1);
+    const lid = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.58, 0.03), mat(0x383531, 0.3));
+    lid.position.set(wx, tableHeight + 0.38, -0.4);
+    lid.rotation.x = -0.22;
     tableGroup.add(base);
-    tableGroup.add(screen);
+    tableGroup.add(lid);
   }
 
-  // Modern Desk Lamp (with warm spot glow)
-  const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.05), metalLegMat);
-  lampBase.position.set(wx + 1.2, tableHeight + 0.12, -0.6);
-  const lampPole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.2), metalLegMat);
-  lampPole.position.set(wx + 1.2, tableHeight + 0.7, -0.6);
-  lampPole.rotation.z = -0.2;
-  const lampHead = new THREE.Mesh(new THREE.ConeGeometry(0.25, 0.35, 16), metalLegMat);
-  lampHead.position.set(wx + 0.95, tableHeight + 1.2, -0.6);
+  // Modern Minimal Desk Lamp
+  const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.04, 16), steelLegMat);
+  lampBase.position.set(wx + 1.1, tableHeight + 0.12, -0.65);
+  const lampPole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.1, 16), steelLegMat);
+  lampPole.position.set(wx + 1.1, tableHeight + 0.65, -0.65);
+  lampPole.rotation.z = -0.25;
+  const lampHead = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.3, 16), steelLegMat);
+  lampHead.position.set(wx + 0.88, tableHeight + 1.1, -0.65);
   lampHead.rotation.z = 0.5;
   tableGroup.add(lampBase);
   tableGroup.add(lampPole);
   tableGroup.add(lampHead);
 
-  // Warm localized light
-  const deskSpot = new THREE.PointLight(0xffedd5, 0.6, 6);
-  deskSpot.position.set(wx + 0.9, tableHeight + 1.1, -0.4);
-  tableGroup.add(deskSpot);
+  // Warm Desk Spotlight
+  const spot = new THREE.PointLight(0xffeedb, 0.45, 5.5);
+  spot.position.set(wx + 0.85, tableHeight + 1.0, -0.45);
+  tableGroup.add(spot);
+  deskSpots.push(spot);
+
+  // Ceramic Coffee Mug
+  const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.09, 0.2, 16), coffeeCupMat);
+  mug.position.set(wx - 0.75, tableHeight + 0.2, -0.1);
+  mug.castShadow = true;
+  tableGroup.add(mug);
 });
 
-// Centerpiece: Minimalist Nano Tank on Table (with glowing animated fish)
-const nanoTankGroup = new THREE.Group();
-nanoTankGroup.position.set(0.5, tableHeight + 0.9, -0.3);
+// Centerpiece: Crystal Nano Aquarium with Aquatic Plants & Swimming Fish
+const nanoAquarium = new THREE.Group();
+nanoAquarium.position.set(0.2, tableHeight + 0.75, -0.3);
 
-const tankGlass = new THREE.Mesh(
-  new THREE.BoxGeometry(2.4, 1.5, 1.5),
-  new THREE.MeshPhysicalMaterial({ color: 0x99f6e4, transmission: 0.9, opacity: 1, transparent: true, roughness: 0.05, ior: 1.33 })
+const aqGlass = new THREE.Mesh(
+  new THREE.BoxGeometry(2.0, 1.2, 1.2),
+  new THREE.MeshPhysicalMaterial({ color: 0x99f6e4, transmission: 0.92, transparent: true, roughness: 0.03, ior: 1.33 })
 );
-nanoTankGroup.add(tankGlass);
+nanoAquarium.add(aqGlass);
 
-const nanoWater = new THREE.Mesh(
-  new THREE.BoxGeometry(2.2, 1.3, 1.3),
-  new THREE.MeshStandardMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.25 })
+const aqWater = new THREE.Mesh(
+  new THREE.BoxGeometry(1.85, 1.05, 1.05),
+  new THREE.MeshStandardMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.22 })
 );
-nanoTankGroup.add(nanoWater);
+nanoAquarium.add(aqWater);
 
-// Animated nano fish
+// Aquatic Plant moss
+const moss = new THREE.Mesh(new THREE.DodecahedronGeometry(0.22), plantGreenMat);
+moss.position.set(-0.4, -0.4, 0);
+nanoAquarium.add(moss);
+
+// Swimming neon fish
 const nanoFishes = [];
 for (let f = 0; f < 3; f++) {
-  const fish = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.22, 6), mat(f === 0 ? 0x00e5ff : 0xff7b72, 0.3));
+  const fish = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.18, 6), mat(f === 0 ? 0x00e5ff : 0xff5252, 0.3));
   fish.rotation.z = Math.PI / 2;
-  nanoTankGroup.add(fish);
-  nanoFishes.push({ mesh: fish, angle: f * 2.1, speed: 0.02 + f * 0.005, rad: 0.6 + f * 0.2, y: -0.2 + f * 0.2 });
+  nanoAquarium.add(fish);
+  nanoFishes.push({ mesh: fish, angle: f * 2.1, speed: 0.02 + f * 0.005, rad: 0.5 + f * 0.15, y: -0.15 + f * 0.15 });
 }
-tableGroup.add(nanoTankGroup);
+tableGroup.add(nanoAquarium);
 
 scene.add(tableGroup);
 
-// --- 6. Task Office Chairs (Teal & Dark Grey Ergonomic Chairs) ---
-function createOfficeChair(x, z, chairMaterial, rotationY = 0) {
+// --- 6. Ergonomic Task Chairs with Wheels ---
+function createErgonomicChair(x, z, chairMat) {
   const group = new THREE.Group();
   group.position.set(x, 0, z);
-  group.rotation.y = rotationY;
 
-  // Wheel Base
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 0.1, 8), metalLegMat);
-  base.position.y = 0.2;
+  // Wheels Base
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.65, 0.1, 8), steelLegMat);
+  base.position.y = 0.18;
   group.add(base);
 
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.2), metalLegMat);
-  pole.position.y = 0.8;
-  group.add(pole);
+  const column = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1.0, 16), steelLegMat);
+  column.position.y = 0.65;
+  group.add(column);
 
-  // Seat Cushion
-  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.25, 1.4), chairMaterial);
-  seat.position.y = 1.45;
+  // Cushion Seat
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.2, 1.3), chairMat);
+  seat.position.y = 1.25;
   seat.castShadow = true;
   group.add(seat);
 
-  // Ergonomic Curved Backrest
-  const back = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.6, 0.18), chairMaterial);
-  back.position.set(0, 2.3, 0.65);
-  back.rotation.x = -0.08;
+  // Ergonomic Curved Mesh Back
+  const back = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.45, 0.16), chairMat);
+  back.position.set(0, 2.05, 0.58);
+  back.rotation.x = -0.07;
   back.castShadow = true;
   group.add(back);
 
@@ -253,130 +310,202 @@ function createOfficeChair(x, z, chairMaterial, rotationY = 0) {
 }
 
 const chairs = [
-  createOfficeChair(-8, 1.4, darkChairMat, 0),
-  createOfficeChair(-2.5, 1.4, tealChairMat, -0.1),
-  createOfficeChair(3.5, 1.4, tealChairMat, 0.15),
-  createOfficeChair(9, 1.4, darkChairMat, -0.1)
+  createErgonomicChair(agentX[0], 1.25, slateFabricMat),
+  createErgonomicChair(agentX[1], 1.25, tealFabricMat),
+  createErgonomicChair(agentX[2], 1.25, tealFabricMat),
+  createErgonomicChair(agentX[3], 1.25, slateFabricMat)
 ];
 chairs.forEach((c) => scene.add(c));
 
-// --- 7. Create Humanoid 3D Characters (Architectural Studio Style) ---
+// --- 7. Humanoid Creative Studio Agents ---
 function createHumanoidAgent(outfitColor, hairColor, isWoman = false) {
   const group = new THREE.Group();
 
   // Head
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 24, 24), mat(0xffdec7, 0.7));
-  head.position.y = 3.6;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 24, 24), skinMat);
+  head.position.y = 3.25;
   head.castShadow = true;
   group.add(head);
 
   // Hair
   const hairGeo = isWoman
-    ? new THREE.SphereGeometry(0.46, 20, 20, 0, Math.PI * 2, 0, Math.PI / 1.5)
-    : new THREE.SphereGeometry(0.45, 20, 20, 0, Math.PI * 2, 0, Math.PI / 2);
+    ? new THREE.SphereGeometry(0.42, 20, 20, 0, Math.PI * 2, 0, Math.PI / 1.5)
+    : new THREE.SphereGeometry(0.41, 20, 20, 0, Math.PI * 2, 0, Math.PI / 2);
   const hair = new THREE.Mesh(hairGeo, mat(hairColor, 0.9));
-  hair.position.set(0, 3.68, 0.02);
+  hair.position.set(0, 3.32, 0.02);
   hair.rotation.x = isWoman ? 0.2 : -0.1;
   group.add(hair);
 
-  // Torso / Stylish Jacket / Cardigan
-  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.45, 1.2, 16), mat(outfitColor, 0.8));
-  torso.position.y = 2.6;
+  // Upper Torso / Blazer / Cardigan
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.42, 1.1, 16), mat(outfitColor, 0.8));
+  torso.position.y = 2.35;
   torso.castShadow = true;
   group.add(torso);
 
-  // Upper Legs (Seated)
-  const legMat = mat(0x2b2926, 0.8);
-  const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.24, 1.1), legMat);
-  leftLeg.position.set(-0.25, 1.6, -0.4);
-  const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.24, 1.1), legMat);
-  rightLeg.position.set(0.25, 1.6, -0.4);
-  group.add(leftLeg);
-  group.add(rightLeg);
+  // Upper Thighs (Seated)
+  const pantsMat = mat(0x262522, 0.85);
+  const leftThigh = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.95), pantsMat);
+  leftThigh.position.set(-0.22, 1.38, -0.35);
+  const rightThigh = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.95), pantsMat);
+  rightThigh.position.set(0.22, 1.38, -0.35);
+  group.add(leftThigh);
+  group.add(rightThigh);
 
-  // Lower Legs
-  const leftShin = new THREE.Mesh(new THREE.BoxGeometry(0.22, 1.2, 0.22), legMat);
-  leftShin.position.set(-0.25, 0.8, -0.85);
-  const rightShin = new THREE.Mesh(new THREE.BoxGeometry(0.22, 1.2, 0.22), legMat);
-  rightShin.position.set(0.25, 0.8, -0.85);
+  // Lower Shins & Shoes
+  const leftShin = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.05, 0.2), pantsMat);
+  leftShin.position.set(-0.22, 0.68, -0.75);
+  const rightShin = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.05, 0.2), pantsMat);
+  rightShin.position.set(0.22, 0.68, -0.75);
   group.add(leftShin);
   group.add(rightShin);
 
-  // Arms (Leaning / Typing towards desk)
+  // Arms
   const armMat = mat(outfitColor, 0.8);
-  const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.8, 0.18), armMat);
-  leftArm.position.set(-0.48, 2.6, -0.2);
-  leftArm.rotation.x = 0.8;
-  const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.8, 0.18), armMat);
-  rightArm.position.set(0.48, 2.6, -0.2);
-  rightArm.rotation.x = 0.8;
+  const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.16), armMat);
+  leftArm.position.set(-0.44, 2.35, -0.15);
+  leftArm.rotation.x = 0.85;
+  const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.16), armMat);
+  rightArm.position.set(0.44, 2.35, -0.15);
+  rightArm.rotation.x = 0.85;
   group.add(leftArm);
   group.add(rightArm);
 
-  return { group, head, torso, leftArm, rightArm };
+  return { group, head, torso, leftArm, rightArm, leftThigh, rightThigh, leftShin, rightShin };
 }
 
-// 4 Agents based on character styling in image:
-// 1. Strategist (Dark coat / thoughtful researcher)
-// 2. Scriptwriter (Terracotta cardigan / creative writer)
-// 3. Shot Director (Olive-camel blazer / visual designer)
-// 4. QA Auditor (Oatmeal jacket / reviewer)
-const agentData = [
-  { id: "strategist", x: -8, outfit: 0x3d3835, hair: 0x221f1d, isWoman: false, name: "Strategist" },
-  { id: "scriptwriter", x: -2.5, outfit: 0x9a4c3e, hair: 0x8d5b34, isWoman: true, name: "Scriptwriter" },
-  { id: "shotDirector", x: 3.5, outfit: 0x7c7365, hair: 0x1f1d1b, isWoman: false, name: "Shot Director" },
-  { id: "qaEvaluator", x: 9, outfit: 0xb5a898, hair: 0x3a2c20, isWoman: false, name: "QA Auditor" }
+// 4 Agents corresponding to the architectural team:
+const agentConfigs = [
+  { id: "strategist", deskX: agentX[0], outfit: 0x363330, hair: 0x1f1d1b, isWoman: false, name: "Strategist" },
+  { id: "scriptwriter", deskX: agentX[1], outfit: 0x8e483b, hair: 0x804d2e, isWoman: true, name: "Scriptwriter" },
+  { id: "shotDirector", deskX: agentX[2], outfit: 0x6e6558, hair: 0x22201e, isWoman: false, name: "Shot Director" },
+  { id: "qaEvaluator", deskX: agentX[3], outfit: 0xb5a695, hair: 0x3d3025, isWoman: false, name: "QA Auditor" }
 ];
 
-const agents = agentData.map((d) => {
-  const character = createHumanoidAgent(d.outfit, d.hair, d.isWoman);
-  character.group.position.set(d.x, 0, 1.3);
-  scene.add(character.group);
-  return { ...d, ...character, baseRotY: 0, currentRotY: 0 };
+const agents = agentConfigs.map((cfg) => {
+  const char = createHumanoidAgent(cfg.outfit, cfg.hair, cfg.isWoman);
+  char.group.position.set(cfg.deskX, 0, 1.15);
+  scene.add(char.group);
+
+  return {
+    ...cfg,
+    ...char,
+    targetX: cfg.deskX,
+    targetZ: 1.15,
+    state: "desk", // "desk", "coffee", "stretching", "chatting"
+    stateTimer: Math.random() * 8 + 4
+  };
 });
 
-// --- 8. Lively Animation Loop ---
+// --- 8. Lively Animation & Autonomous Behavior Engine ---
 let clock = new THREE.Clock();
 let activeAgentId = "idle";
 
 function animate() {
   requestAnimationFrame(animate);
   const time = clock.getElapsedTime();
+  const delta = clock.getDelta();
 
-  // 1. Nano Fish Swimming
+  // 1. Nano Aquarium Fishes Swimming
   nanoFishes.forEach((f) => {
     f.angle += f.speed;
     f.mesh.position.x = Math.cos(f.angle) * f.rad;
     f.mesh.position.z = Math.sin(f.angle) * (f.rad * 0.7);
-    f.mesh.position.y = f.y + Math.sin(time * 3 + f.angle) * 0.08;
+    f.mesh.position.y = f.y + Math.sin(time * 3 + f.angle) * 0.06;
     f.mesh.rotation.y = -f.angle + Math.PI / 2;
   });
 
-  // 2. Lively Agent Animations
+  // 2. Agents Autonomous Behaviors & Lively Animations
   agents.forEach((ag, idx) => {
-    const isWorking = activeAgentId === ag.id;
+    const isExecuting = activeAgentId === ag.id;
 
-    // Breathing & natural posture shifting
-    ag.torso.position.y = 2.6 + Math.sin(time * 2 + idx) * 0.025;
-    ag.head.position.y = 3.6 + Math.sin(time * 2 + idx) * 0.035;
-
-    // Natural head nodding / looking around
-    ag.head.rotation.y = Math.sin(time * 0.8 + idx * 1.5) * 0.12;
-    ag.head.rotation.x = isWorking ? 0.2 + Math.sin(time * 8) * 0.05 : Math.sin(time * 0.5 + idx) * 0.05;
-
-    // Typing / Writing hand motions
-    if (isWorking) {
-      ag.leftArm.rotation.x = 0.8 + Math.sin(time * 16) * 0.12;
-      ag.rightArm.rotation.x = 0.8 + Math.cos(time * 16) * 0.12;
-      ag.group.position.y = Math.abs(Math.sin(time * 6)) * 0.06; // Active slight chair bounce
+    // Countdown state timer for idle actions (getting coffee, stretching, chatting)
+    if (activeAgentId === "idle") {
+      ag.stateTimer -= 0.016;
+      if (ag.stateTimer <= 0) {
+        // Switch between behaviors naturally
+        if (ag.state === "desk") {
+          const rand = Math.random();
+          if (rand < 0.35) {
+            ag.state = "coffee";
+            ag.targetX = -12.5; // Walk to coffee station
+            ag.targetZ = 0.5;
+            ag.stateTimer = 9.0;
+          } else if (rand < 0.65) {
+            ag.state = "stretching";
+            ag.stateTimer = 5.0;
+          } else {
+            ag.state = "chatting";
+            ag.stateTimer = 6.0;
+          }
+        } else {
+          // Return to desk
+          ag.state = "desk";
+          ag.targetX = ag.deskX;
+          ag.targetZ = 1.15;
+          ag.stateTimer = Math.random() * 12 + 6;
+        }
+      }
     } else {
-      ag.leftArm.rotation.x = 0.8 + Math.sin(time * 1.5 + idx) * 0.03;
-      ag.rightArm.rotation.x = 0.8 + Math.cos(time * 1.5 + idx) * 0.03;
+      // During active execution: ensure active agent is at their desk working
+      if (isExecuting && ag.state !== "desk") {
+        ag.state = "desk";
+        ag.targetX = ag.deskX;
+        ag.targetZ = 1.15;
+      }
+    }
+
+    // Interpolate walking movement towards target
+    ag.group.position.x += (ag.targetX - ag.group.position.x) * 0.06;
+    ag.group.position.z += (ag.targetZ - ag.group.position.z) * 0.06;
+
+    const isWalking = Math.abs(ag.targetX - ag.group.position.x) > 0.15;
+
+    // Body Animation based on state:
+    if (isWalking) {
+      // Walking motion
+      ag.group.position.y = Math.abs(Math.sin(time * 8)) * 0.1;
+      ag.leftArm.rotation.x = Math.sin(time * 8) * 0.6;
+      ag.rightArm.rotation.x = -Math.sin(time * 8) * 0.6;
+      ag.group.rotation.y = ag.targetX < ag.group.position.x ? -Math.PI / 2 : Math.PI / 2;
+    } else {
+      // Stationed motion
+      ag.group.rotation.y = 0;
       ag.group.position.y = 0;
+
+      // Natural Breathing & subtle posture rocking
+      ag.torso.position.y = 2.35 + Math.sin(time * 2 + idx) * 0.02;
+      ag.head.position.y = 3.25 + Math.sin(time * 2 + idx) * 0.03;
+
+      if (isExecuting) {
+        // Active Fast Typing & Focused Leaning
+        ag.leftArm.rotation.x = 0.85 + Math.sin(time * 18) * 0.15;
+        ag.rightArm.rotation.x = 0.85 + Math.cos(time * 18) * 0.15;
+        ag.head.rotation.x = 0.22 + Math.sin(time * 8) * 0.04;
+        ag.head.rotation.y = Math.sin(time * 2) * 0.05;
+        deskSpots[idx].intensity = 0.95; // Lamp brightens
+      } else if (ag.state === "stretching") {
+        // Stretching arms up and back
+        ag.leftArm.rotation.x = -1.2 + Math.sin(time * 3) * 0.2;
+        ag.rightArm.rotation.x = -1.2 + Math.sin(time * 3) * 0.2;
+        ag.head.rotation.x = -0.3 + Math.sin(time * 2) * 0.1;
+        deskSpots[idx].intensity = 0.45;
+      } else if (ag.state === "coffee") {
+        // Holding & sipping coffee at the bar
+        ag.leftArm.rotation.x = 0.5;
+        ag.rightArm.rotation.x = 1.4 + Math.sin(time * 1.5) * 0.15;
+        ag.head.rotation.x = 0.1 + Math.sin(time * 1.5) * 0.1;
+      } else {
+        // Normal Desk work: occasional typing, coffee sipping, looking at colleagues
+        ag.leftArm.rotation.x = 0.85 + Math.sin(time * 2 + idx) * 0.04;
+        ag.rightArm.rotation.x = 0.85 + Math.cos(time * 2 + idx) * 0.04;
+        ag.head.rotation.y = Math.sin(time * 0.6 + idx * 1.2) * 0.15;
+        ag.head.rotation.x = Math.sin(time * 0.4 + idx) * 0.06;
+        deskSpots[idx].intensity = 0.45;
+      }
     }
 
     // Chair subtle swivel
-    chairs[idx].rotation.y = Math.sin(time * 0.6 + idx) * 0.06;
+    chairs[idx].rotation.y = Math.sin(time * 0.5 + idx) * 0.05;
   });
 
   controls.update();
@@ -384,7 +513,7 @@ function animate() {
 }
 animate();
 
-// Resize Handler
+// Window Resize Handler
 window.addEventListener("resize", () => {
   const w = container.clientWidth;
   const h = container.clientHeight;
@@ -393,7 +522,7 @@ window.addEventListener("resize", () => {
   renderer.setSize(w, h);
 });
 
-// --- 9. UI Interaction & Workflow ---
+// --- 9. UI & Pipeline Controller ---
 const topicInput = document.getElementById("topicInput");
 const generateForm = document.getElementById("generateForm");
 const startBtn = document.getElementById("startBtn");
@@ -408,7 +537,7 @@ const resultContent = document.getElementById("resultContent");
 
 let currentPackData = null;
 
-// Chip Preset Click Handlers
+// Preset Chip Clicks
 chips.forEach((chip) => {
   chip.addEventListener("click", () => {
     chips.forEach((c) => c.classList.remove("active"));
@@ -426,10 +555,10 @@ generateForm.addEventListener("submit", async (e) => {
   startBtn.disabled = true;
   startBtn.style.opacity = "0.6";
 
-  // Trigger Lively Agent Animation Sequence
-  await runLivelyStudioSequence(topic);
+  // Trigger Lively Agent Step Sequence
+  await runStudioPipelineSequence(topic);
 
-  // Fetch from Python server
+  // Fetch from Python backend
   try {
     const res = await fetch("/api/generate", {
       method: "POST",
@@ -450,37 +579,37 @@ generateForm.addEventListener("submit", async (e) => {
   }
 
   activeAgentId = "idle";
-  setActivityStatus("🎉 สตูดิโอผลิตคลิปเสร็จสมบูรณ์!", "พร้อมนำบทไปอัดเสียง & ถ่ายคลิปจริงตามไกด์มุมกล้อง", "✅");
+  setActivityStatus("Production Sheet Complete", "Ready for voiceover recording and video shooting in your store", true);
   startBtn.disabled = false;
   startBtn.style.opacity = "1";
 });
 
-async function runLivelyStudioSequence(topic) {
-  // 1. Strategist (The Researcher)
+async function runStudioPipelineSequence(topic) {
+  // 1. Strategist
   activeAgentId = "strategist";
-  setActivityStatus("Strategist Agent (นักกลยุทธ์)", `กำลังวิเคราะห์ Pain Point & หา Hook สำหรับ: "${topic}"`, "🧠");
-  await sleep(1400);
-
-  // 2. Scriptwriter (The Writer)
-  activeAgentId = "scriptwriter";
-  setActivityStatus("Scriptwriter Agent (นักเขียนบท)", "กำลังเขียนบทพากย์ 30 วิ + ปรับจังหวะ Hook 3 วินาทีแรก...", "✍️");
+  setActivityStatus("Strategist Agent", `Researching audience pain points and viral hooks for: "${topic}"`);
   await sleep(1500);
 
-  // 3. Shot Director (The Visual Director)
-  activeAgentId = "shotDirector";
-  setActivityStatus("Shot Director Agent (ผู้กำกับภาพ)", "กำลังวางมุมกล้องถ่ายจริง (Macro, Top-down, Wide)...", "🎬");
-  await sleep(1400);
+  // 2. Scriptwriter
+  activeAgentId = "scriptwriter";
+  setActivityStatus("Scriptwriter Agent", "Composing 30s voiceover script and 3-second retention hook...");
+  await sleep(1600);
 
-  // 4. QA Auditor (The Reviewer)
+  // 3. Shot Director
+  activeAgentId = "shotDirector";
+  setActivityStatus("Shot Director Agent", "Directing physical camera angles (Macro close-up, Top-down, Wide setup)...");
+  await sleep(1500);
+
+  // 4. QA Auditor
   activeAgentId = "qaEvaluator";
-  setActivityStatus("QA Auditor Agent (ฝ่ายตรวจคุณภาพ)", "ตรวจสอบคะแนน TikTok Algorithm & Retention Score...", "📊");
-  await sleep(1100);
+  setActivityStatus("QA Auditor Agent", "Auditing algorithm retention score and filming feasibility...");
+  await sleep(1200);
 }
 
-function setActivityStatus(name, text, icon) {
+function setActivityStatus(name, text, isDone = false) {
   activeAgentName.innerText = name;
   activityStatus.innerText = text;
-  activeAgentMini.innerText = icon;
+  document.getElementById("activeSpinner").style.display = isDone ? "none" : "block";
 }
 
 function sleep(ms) {
@@ -505,7 +634,7 @@ function renderProductionPack(pack) {
   // Hook Text
   document.getElementById("scriptHookText").innerText = `"${script.hook_3sec}"`;
 
-  // Scenes
+  // Scenes List
   const scenesList = document.getElementById("scenesList");
   scenesList.innerHTML = "";
 
@@ -514,17 +643,17 @@ function renderProductionPack(pack) {
     card.className = "scene-card";
     card.innerHTML = `
       <div class="scene-header">
-        <span class="scene-tag">📍 Scene ${scene.scene_number}</span>
-        <span class="scene-time">⏱️ ${scene.time_range}</span>
+        <span class="scene-tag">Scene ${scene.scene_number}</span>
+        <span class="scene-time">${scene.time_range}</span>
       </div>
       <div class="vo-text">
-        <strong>🗣️ บทพูดพากย์ (Voiceover):</strong> "${scene.voiceover_th}"
+        <strong>Voiceover:</strong> "${scene.voiceover_th}"
       </div>
       <div class="on-screen-pill">
-        📱 ข้อความบนจอ: <code>${scene.on_screen_text}</code>
+        <span>On-Screen Text:</span> <code>${scene.on_screen_text}</code>
       </div>
       <div class="shot-guide-box">
-        <strong>🎥 ไกด์มุมกล้องถ่ายจริงในร้าน:</strong> ${scene.camera_shot_guide || "มุมถ่ายเจาะตู้ปลาแบบคลีนๆ"}
+        <strong>Camera Direction:</strong> ${scene.camera_shot_guide || "Clean front shot focusing on aquarium"}
       </div>
     `;
     scenesList.appendChild(card);
@@ -538,38 +667,38 @@ function renderProductionPack(pack) {
 function renderFallbackPack(topic) {
   const fallbackPack = {
     script: {
-      hook_3sec: `ทำไม ${topic.slice(0, 25)} ถึงเป็นเรื่องที่คนเลี้ยงปลาเข้าใจผิดบ่อยสุด?`,
+      hook_3sec: `ทำไมเรื่องเกี่ยวกับ "${topic.slice(0, 25)}" ถึงสำคัญที่คนเลี้ยงปลาต้องรู้?`,
       scenes: [
         {
           scene_number: 1,
           time_range: "00:00 - 00:03",
           voiceover_th: `เคยสงสัยมั้ยครับ? เรื่องเกี่ยวกับ ${topic.slice(0, 20)} ที่หลายคนไม่เคยรู้มาก่อน...`,
           on_screen_text: `ความลับของ ${topic.slice(0, 15)}!`,
-          camera_shot_guide: "🎥 [Hook Shot] มุมถ่ายตรงหน้าตู้ปลา ใช้ไฟตู้ส่องนำสายตา ปิดไฟห้องรอบข้างเพื่อให้ปลาดูโดดเด่นทันที"
+          camera_shot_guide: "[Hook Shot] มุมถ่ายตรงหน้าตู้ปลา ใช้ไฟตู้ส่องนำสายตา ปิดไฟห้องรอบข้างเพื่อให้ปลาดูโดดเด่นทันที"
         },
         {
           scene_number: 2,
           time_range: "00:04 - 00:14",
           voiceover_th: `ความจริงคือระบบนิเวศน์ในตู้ต้องการความสมดุลครับ ถ้าเราปรับจังหวะน้ำและระบบกรองให้ถูก ปัญหานี้จะหายไปทันที`,
           on_screen_text: `หัวใจคือระบบนิเวศน์สมดุล!`,
-          camera_shot_guide: "🔬 [Insight Shot] มุม Macro Close-up เจาะพฤติกรรมการว่ายน้ำและขยับเหงือกของปลาในระยะประชิด"
+          camera_shot_guide: "[Insight Shot] มุม Macro Close-up เจาะพฤติกรรมการว่ายน้ำและขยับเหงือกของปลาในระยะประชิด"
         },
         {
           scene_number: 3,
           time_range: "00:15 - 00:24",
           voiceover_th: `วิธีแก้ง่ายๆ ที่ร้านเราใช้คือ จัดเลย์เอาต์ให้โปร่ง และเปลี่ยนน้ำสม่ำเสมอครั้งละ 20% ครับ`,
           on_screen_text: `ทริค: จัดตู้โปร่ง & เปลี่ยนน้ำ 20%`,
-          camera_shot_guide: "✨ [Action Tip Shot] มุมกว้างเฉียง 45 องศา โชว์ภาพรวมความใสของน้ำและการจัดวางไม้น้ำ/หินแบบคลีนๆ"
+          camera_shot_guide: "[Action Tip Shot] มุมกว้างเฉียง 45 องศา โชว์ภาพรวมความใสของน้ำและการจัดวางไม้น้ำ/หินแบบคลีนๆ"
         },
         {
           scene_number: 4,
           time_range: "00:25 - 00:30",
           voiceover_th: `ตู้ที่บ้านเพื่อนๆ เจอแบบนี้กันมั้ยครับ? ลองคอมเมนต์บอกหน่อย เดี๋ยวช่วยตอบให้ครับ`,
-          on_screen_text: `ที่บ้านเจอมั้ย? คอมเมนต์เลย 👇`,
-          camera_shot_guide: "🛋️ [CTA Shot] มุม Slow Pan ช้าๆ ถอยออกจากตู้ปลา เห็นบรรยากาศโต๊ะทำงานที่ผ่อนคลาย"
+          on_screen_text: `ที่บ้านเจอมั้ย? คอมเมนต์เลย`,
+          camera_shot_guide: "[CTA Shot] มุม Slow Pan ช้าๆ ถอยออกจากตู้ปลา เห็นบรรยากาศโต๊ะทำงานที่ผ่อนคลาย"
         }
       ],
-      caption_th: `${topic} 🐟✨ ทริคดีๆ จากร้านปลาสวยงาม เซฟคลิปนี้ไว้ดูตอนจัดตู้ได้เลยครับ! #ปลาสวยงาม #ตู้ปลา #เลี้ยงปลา #TikTokUni`,
+      caption_th: `${topic} ทริคดีๆ จากร้านปลาสวยงาม เซฟคลิปนี้ไว้ดูตอนจัดตู้ได้เลยครับ! #ปลาสวยงาม #ตู้ปลา #เลี้ยงปลา #TikTokUni`,
       hashtags: ["#ปลาสวยงาม", "#ตู้ปลามินิมอล", "#Aquascaping", "#สัตว์เลี้ยง"],
       pinned_comment: "ใครเลี้ยงปลาชนิดนี้อยู่บ้าง? เจอปัญหานี้กันมั้ย พิมพ์ขนาดตู้กับอาการมาในคอมเมนต์ได้เลยครับ!"
     },
@@ -588,19 +717,19 @@ function renderFallbackPack(topic) {
 function copyText(elementId) {
   const text = document.getElementById(elementId).innerText;
   navigator.clipboard.writeText(text);
-  alert("📋 Copy ข้อความเรียบร้อย!");
+  alert("Copied to clipboard!");
 }
 
 document.getElementById("copyAllBtn")?.addEventListener("click", () => {
   if (!currentPackData) return;
   const script = currentPackData.script;
-  let fullText = `🎬 TikTok Script: ${script.hook_3sec}\n\n`;
+  let fullText = `TikTok Script: ${script.hook_3sec}\n\n`;
   script.scenes.forEach((s) => {
-    fullText += `[${s.time_range}] ${s.voiceover_th}\n(Text: ${s.on_screen_text})\n🎥 Shot: ${s.camera_shot_guide}\n\n`;
+    fullText += `[${s.time_range}] ${s.voiceover_th}\n(Text: ${s.on_screen_text})\nShot: ${s.camera_shot_guide}\n\n`;
   });
   fullText += `Caption:\n${script.caption_th}\n\nPinned Comment:\n${script.pinned_comment}`;
   navigator.clipboard.writeText(fullText);
-  alert("📋 Copy Production Sheet ทั้งหมดสำเร็จ!");
+  alert("Production Sheet Copied!");
 });
 
 document.getElementById("downloadMdBtn")?.addEventListener("click", () => {
