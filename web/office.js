@@ -41,6 +41,8 @@
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.95;
   container.appendChild(renderer.domElement);
   renderer.domElement.style.cssText = "position:absolute;inset:0;width:100%;height:100%;display:block;";
 
@@ -67,11 +69,11 @@
   window.addEventListener("resize", resize);
   resize();
 
-  // ---------- atmosphere (smoothly blended) ----------
+  // ---------- atmosphere (soft, balanced studio lighting - not overexposed) ----------
   const PRESETS = {
-    day:    { bg: 0xf1ebe1, amb: 0xfff1e0, ambI: 0.62, hemiI: 0.5,  sun: 0xfff2dc, sunI: 0.95, sunPos: [14, 22, 14],  fill: 0xdfe8ff, fillI: 0.28, lamp: 0.0 },
-    sunset: { bg: 0xf0cfae, amb: 0xffd9b0, ambI: 0.55, hemiI: 0.4,  sun: 0xff9a55, sunI: 1.0,  sunPos: [24, 9, 10],   fill: 0xf5a3c7, fillI: 0.35, lamp: 0.35 },
-    night:  { bg: 0x1c2433, amb: 0x3a4a6b, ambI: 0.5,  hemiI: 0.25, sun: 0x9db7ff, sunI: 0.3,  sunPos: [-12, 20, 8],  fill: 0x22304a, fillI: 0.2,  lamp: 0.95 }
+    day:    { bg: 0xe6e0d5, amb: 0xf5ede1, ambI: 0.42, hemiI: 0.35, sun: 0xfff0dc, sunI: 0.65, sunPos: [14, 22, 14],  fill: 0xc8d7eb, fillI: 0.20, lamp: 0.0 },
+    sunset: { bg: 0xdcb896, amb: 0xf8cb9c, ambI: 0.40, hemiI: 0.28, sun: 0xf48842, sunI: 0.70, sunPos: [24, 9, 10],   fill: 0xe897b6, fillI: 0.24, lamp: 0.30 },
+    night:  { bg: 0x161d28, amb: 0x303e58, ambI: 0.38, hemiI: 0.20, sun: 0x8ba6e8, sunI: 0.25, sunPos: [-12, 20, 8],  fill: 0x1b273d, fillI: 0.16, lamp: 0.85 }
   };
   const cur = {
     bg: new THREE.Color(PRESETS.day.bg), amb: new THREE.Color(PRESETS.day.amb), sun: new THREE.Color(PRESETS.day.sun),
@@ -83,10 +85,10 @@
   let autoTimer = 0;
 
   scene.background = cur.bg;
-  scene.fog = new THREE.Fog(cur.bg.clone(), 70, 160); // very light – no more washed-out look
+  scene.fog = new THREE.Fog(cur.bg.clone(), 65, 175);
 
   const ambient = new THREE.AmbientLight(cur.amb, cur.ambI);
-  const hemi = new THREE.HemisphereLight(0xffffff, 0xd9cbb8, cur.hemiI);
+  const hemi = new THREE.HemisphereLight(0xfff7ed, 0xbab0a0, cur.hemiI);
   const sun = new THREE.DirectionalLight(cur.sun, cur.sunI);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
@@ -118,12 +120,12 @@
 
   // ---------- materials ----------
   const M = (color, rough = 0.85, metal = 0.0) => new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
-  const mWall = M(0xf4f0e9, 0.95), mFloor = M(0xece5d8, 0.9), mRug = M(0xe2d9ca, 1.0);
-  const mOak = M(0xcdb393, 0.8), mOakDark = M(0xa98d6c, 0.8), mDesk = M(0xfbf9f5, 0.5);
-  const mSteel = M(0x3a3835, 0.4, 0.3), mCream = M(0xf6f1e8, 0.7), mBeige = M(0xe3d8c8, 0.85);
-  const mPlant = M(0x6f9a74, 0.8), mPot = M(0xe9ddcc, 0.7), mDark = M(0x38353a, 0.5);
-  const mGlass = new THREE.MeshStandardMaterial({ color: 0xcfeee6, transparent: true, opacity: 0.22, roughness: 0.05, metalness: 0.0, depthWrite: false });
-  const mWater = new THREE.MeshStandardMaterial({ color: 0x7fd3e6, transparent: true, opacity: 0.28, roughness: 0.2, depthWrite: false });
+  const mWall = M(0xe8e2d7, 0.95), mFloor = M(0xded5c6, 0.9), mRug = M(0xd5cab8, 1.0);
+  const mOak = M(0xc4a682, 0.8), mOakDark = M(0x9a7d5c, 0.8), mDesk = M(0xf3eee6, 0.6);
+  const mSteel = M(0x32302d, 0.4, 0.3), mCream = M(0xeee7db, 0.7), mBeige = M(0xd9ccba, 0.85);
+  const mPlant = M(0x5e8b63, 0.8), mPot = M(0xdfd1be, 0.7), mDark = M(0x302e33, 0.5);
+  const mGlass = new THREE.MeshStandardMaterial({ color: 0xbde6dc, transparent: true, opacity: 0.22, roughness: 0.05, metalness: 0.0, depthWrite: false });
+  const mWater = new THREE.MeshStandardMaterial({ color: 0x6bc4d8, transparent: true, opacity: 0.28, roughness: 0.2, depthWrite: false });
 
   function box(w, h, d, mat, x = 0, y = 0, z = 0, shadow = true) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
@@ -152,8 +154,8 @@
     return t;
   }
   const tileTex = canvasTex(1024, 512, (g, w, h) => {
-    g.fillStyle = "#f4f0e9"; g.fillRect(0, 0, w, h);
-    g.strokeStyle = "rgba(190,176,158,0.55)"; g.lineWidth = 3;
+    g.fillStyle = "#e8e2d7"; g.fillRect(0, 0, w, h);
+    g.strokeStyle = "rgba(175,160,140,0.55)"; g.lineWidth = 3;
     for (let x = 0; x <= w; x += 128) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
     for (let y = 0; y <= h; y += 128) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
   });
