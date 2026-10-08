@@ -156,11 +156,11 @@ wallArt.forEach((art) => {
 });
 scene.add(wallGroup);
 
-// Espresso & Coffee Counter
+// Espresso & Coffee Counter (Shifted left to -15.5 to avoid overlapping table)
 const coffeeStation = new THREE.Group();
-coffeeStation.position.set(-13.5, 0, -1.5);
+coffeeStation.position.set(-15.5, 0, -1.0);
 
-const counterTable = new THREE.Mesh(new THREE.BoxGeometry(3.8, 2.5, 2.2), richHoneyOakMat);
+const counterTable = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.5, 2.0), richHoneyOakMat);
 counterTable.position.set(0, 1.25, 0);
 counterTable.castShadow = true;
 counterTable.receiveShadow = true;
@@ -178,11 +178,11 @@ for (let c = 0; c < 3; c++) {
   coffeeStation.add(cup);
 }
 
-const plantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.35, 0.9, 16), mat(0xb85d38, 0.8));
-plantPot.position.set(1.4, 0.45, 1.2);
+const plantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.32, 0.85, 16), mat(0xb85d38, 0.8));
+plantPot.position.set(-2.2, 0.42, 0.2);
 plantPot.castShadow = true;
-const plantFoliage = new THREE.Mesh(new THREE.DodecahedronGeometry(0.75), plantGreenMat);
-plantFoliage.position.set(1.4, 1.25, 1.2);
+const plantFoliage = new THREE.Mesh(new THREE.DodecahedronGeometry(0.72), plantGreenMat);
+plantFoliage.position.set(-2.2, 1.2, 0.2);
 plantFoliage.castShadow = true;
 coffeeStation.add(plantPot);
 coffeeStation.add(plantFoliage);
@@ -310,12 +310,13 @@ tableGroup.add(nanoAquarium);
 
 scene.add(tableGroup);
 
-// --- 6. Ergonomic Task Chairs (Height = 1.45 at cushion) ---
+// --- 6. Ergonomic Task Chairs (Placed at z = 1.35, facing -Z towards table) ---
 function createErgonomicChair(x, z, chairMat) {
   const group = new THREE.Group();
   group.position.set(x, 0, z);
 
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 0.12, 8), steelLegMat);
+  // Wheels Base
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.65, 0.12, 8), steelLegMat);
   base.position.y = 0.2;
   group.add(base);
 
@@ -323,14 +324,16 @@ function createErgonomicChair(x, z, chairMat) {
   column.position.y = 0.75;
   group.add(column);
 
-  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.22, 1.4), chairMat);
-  seat.position.y = 1.35; // Cushion top is at y = 1.46
+  // Cushion Seat
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.2, 1.3), chairMat);
+  seat.position.y = 1.35; // Cushion top at y = 1.45
   seat.castShadow = true;
   group.add(seat);
 
-  const back = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.5, 0.18), chairMat);
-  back.position.set(0, 2.2, 0.62);
-  back.rotation.x = -0.08;
+  // Ergonomic Curved Mesh Back (at +Z so chair faces -Z towards desk)
+  const back = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.5, 0.16), chairMat);
+  back.position.set(0, 2.15, 0.58);
+  back.rotation.x = -0.06;
   back.castShadow = true;
   group.add(back);
 
@@ -338,20 +341,20 @@ function createErgonomicChair(x, z, chairMat) {
 }
 
 const chairs = [
-  createErgonomicChair(agentX[0], 1.4, navyFabricMat),
-  createErgonomicChair(agentX[1], 1.4, tealFabricMat),
-  createErgonomicChair(agentX[2], 1.4, tealFabricMat),
-  createErgonomicChair(agentX[3], 1.4, navyFabricMat)
+  createErgonomicChair(agentX[0], 1.35, navyFabricMat),
+  createErgonomicChair(agentX[1], 1.35, tealFabricMat),
+  createErgonomicChair(agentX[2], 1.35, tealFabricMat),
+  createErgonomicChair(agentX[3], 1.35, navyFabricMat)
 ];
 chairs.forEach((c) => scene.add(c));
 
-// --- 7. Highly Detailed 3D Humanoid Agent Rig ---
+// --- 7. Highly Detailed 3D Humanoid Agent Rig (Facing -Z towards desk) ---
 function createDetailedHumanoid(cfg) {
   const root = new THREE.Group();
 
-  // Pelvis / Hips Group (Proper seating height at y = 1.48)
+  // Pelvis / Hips Group (Seated right on cushion at y = 1.46)
   const pelvis = new THREE.Group();
-  pelvis.position.y = 1.48;
+  pelvis.position.y = 1.46;
   root.add(pelvis);
 
   // Torso / Outer Coat / Cardigan
@@ -361,54 +364,53 @@ function createDetailedHumanoid(cfg) {
   const shoeMat = cfg.isWoman ? sneakerWhiteMat : shoeLeatherMat;
 
   // Upper Body
-  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 1.15, 16), coatMat);
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.42, 1.15, 16), coatMat);
   torso.position.y = 0.75;
   torso.castShadow = true;
   pelvis.add(torso);
 
-  // Inner Shirt / Lapel V-neck Collar
-  const lapel = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.5, 0.08), innerShirtMat);
-  lapel.position.set(0, 1.05, 0.22);
+  // Lapel V-neck Collar (Facing -Z front)
+  const lapel = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.48, 0.08), innerShirtMat);
+  lapel.position.set(0, 1.05, -0.22);
   pelvis.add(lapel);
 
-  // Head & Neck
-  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.25, 16), skinMat);
+  // Neck & Head
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.22, 16), skinMat);
   neck.position.y = 1.42;
   pelvis.add(neck);
 
   const headGroup = new THREE.Group();
-  headGroup.position.y = 1.72; // Head center at y = 3.20 (Clearly above table top 2.6!)
+  headGroup.position.y = 1.72; // Head center at y = 3.18, clearly visible above desk!
 
   const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.38, 24, 24), skinMat);
   headMesh.castShadow = true;
   headGroup.add(headMesh);
 
-  // Stylized Hair
+  // Stylized Hair (Back is at +Z, Face is at -Z)
   const hairMat = mat(cfg.hair, 0.9);
   if (cfg.isWoman) {
-    // Elegant layered bob hairstyle
-    const hairTop = new THREE.Mesh(new THREE.SphereGeometry(0.42, 20, 20, 0, Math.PI * 2, 0, Math.PI / 1.4), hairMat);
+    // Layered bob with bangs at -Z
+    const hairTop = new THREE.Mesh(new THREE.SphereGeometry(0.42, 20, 20, 0, Math.PI * 2, 0, Math.PI / 1.5), hairMat);
     hairTop.position.set(0, 0.08, 0.02);
     headGroup.add(hairTop);
-    const bangs = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.22, 0.16), hairMat);
-    bangs.position.set(0, 0.22, 0.3);
+    const bangs = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.2, 0.16), hairMat);
+    bangs.position.set(0, 0.2, -0.3);
     headGroup.add(bangs);
   } else {
-    // Stylized modern parted hairstyle
+    // Sleek parted hair
     const hairTop = new THREE.Mesh(new THREE.SphereGeometry(0.41, 20, 20, 0, Math.PI * 2, 0, Math.PI / 1.8), hairMat);
     hairTop.position.set(0, 0.08, 0.02);
     headGroup.add(hairTop);
   }
 
-  // Glasses on Strategist / QA
+  // Glasses (at -Z face side)
   if (cfg.hasGlasses) {
-    const glasses = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.02, 8, 16), steelLegMat);
-    const glassesL = glasses.clone();
-    glassesL.position.set(-0.16, 0.05, 0.38);
-    const glassesR = glasses.clone();
-    glassesR.position.set(0.16, 0.05, 0.38);
+    const glassesL = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.02, 8, 16), steelLegMat);
+    glassesL.position.set(-0.16, 0.05, -0.38);
+    const glassesR = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.02, 8, 16), steelLegMat);
+    glassesR.position.set(0.16, 0.05, -0.38);
     const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.02), steelLegMat);
-    bridge.position.set(0, 0.05, 0.38);
+    bridge.position.set(0, 0.05, -0.38);
     headGroup.add(glassesL);
     headGroup.add(glassesR);
     headGroup.add(bridge);
@@ -416,9 +418,9 @@ function createDetailedHumanoid(cfg) {
 
   pelvis.add(headGroup);
 
-  // Left & Right Arms (Pivoting at shoulders)
+  // Left & Right Arms (Pivoting at shoulders, reaching forward towards -Z desk)
   const leftArmPivot = new THREE.Group();
-  leftArmPivot.position.set(-0.52, 1.22, 0);
+  leftArmPivot.position.set(-0.5, 1.22, 0);
   const leftUpperArm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.16), coatMat);
   leftUpperArm.position.y = -0.36;
   leftUpperArm.castShadow = true;
@@ -429,7 +431,7 @@ function createDetailedHumanoid(cfg) {
   pelvis.add(leftArmPivot);
 
   const rightArmPivot = new THREE.Group();
-  rightArmPivot.position.set(0.52, 1.22, 0);
+  rightArmPivot.position.set(0.5, 1.22, 0);
   const rightUpperArm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.16), coatMat);
   rightUpperArm.position.y = -0.36;
   rightUpperArm.castShadow = true;
@@ -439,35 +441,36 @@ function createDetailedHumanoid(cfg) {
   rightArmPivot.add(rightHand);
   pelvis.add(rightArmPivot);
 
-  // Left & Right Legs with Knees and Shoes
+  // Left & Right Legs (Pivoting at hips)
+  // When sitting, thighs project forward towards -Z (under desk) and shins drop down
   const leftLegPivot = new THREE.Group();
-  leftLegPivot.position.set(-0.24, 0, 0);
-  const leftThigh = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.75, 0.22), pantsMat);
-  leftThigh.position.y = -0.38;
+  leftLegPivot.position.set(-0.22, 0, 0);
+  const leftThigh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.72, 0.2), pantsMat);
+  leftThigh.position.y = -0.36;
   leftThigh.castShadow = true;
   leftLegPivot.add(leftThigh);
-  const leftShin = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.75, 0.2), pantsMat);
-  leftShin.position.set(0, -1.05, 0);
+  const leftShin = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.72, 0.18), pantsMat);
+  leftShin.position.set(0, -1.0, 0);
   leftShin.castShadow = true;
   leftLegPivot.add(leftShin);
-  const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.14, 0.44), shoeMat);
-  leftShoe.position.set(0, -1.45, 0.08);
+  const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.14, 0.42), shoeMat);
+  leftShoe.position.set(0, -1.4, -0.08); // Shoe points forward -Z
   leftShoe.castShadow = true;
   leftLegPivot.add(leftShoe);
   pelvis.add(leftLegPivot);
 
   const rightLegPivot = new THREE.Group();
-  rightLegPivot.position.set(0.24, 0, 0);
-  const rightThigh = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.75, 0.22), pantsMat);
-  rightThigh.position.y = -0.38;
+  rightLegPivot.position.set(0.22, 0, 0);
+  const rightThigh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.72, 0.2), pantsMat);
+  rightThigh.position.y = -0.36;
   rightThigh.castShadow = true;
   rightLegPivot.add(rightThigh);
-  const rightShin = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.75, 0.2), pantsMat);
-  rightShin.position.set(0, -1.05, 0);
+  const rightShin = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.72, 0.18), pantsMat);
+  rightShin.position.set(0, -1.0, 0);
   rightShin.castShadow = true;
   rightLegPivot.add(rightShin);
-  const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.14, 0.44), shoeMat);
-  rightShoe.position.set(0, -1.45, 0.08);
+  const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.14, 0.42), shoeMat);
+  rightShoe.position.set(0, -1.4, -0.08); // Shoe points forward -Z
   rightShoe.castShadow = true;
   rightLegPivot.add(rightShoe);
   pelvis.add(rightLegPivot);
@@ -493,14 +496,14 @@ const agentConfigs = [
 
 const agents = agentConfigs.map((cfg) => {
   const char = createDetailedHumanoid(cfg);
-  char.root.position.set(cfg.deskX, 0, 1.4); // Seated position at chair
+  char.root.position.set(cfg.deskX, 0, 1.35); // Seated on chair at z = 1.35
   scene.add(char.root);
 
   return {
     ...cfg,
     ...char,
     targetX: cfg.deskX,
-    targetZ: 1.4,
+    targetZ: 1.35,
     state: "desk",
     stateTimer: Math.random() * 8 + 4,
     walkCycle: 0
@@ -545,22 +548,22 @@ function animate() {
           const rand = Math.random();
           if (rand < 0.4) {
             ag.state = "coffee";
-            ag.targetX = -12.5;
-            ag.targetZ = 0.6;
+            ag.targetX = -14.5; // Stand neatly in front of coffee counter
+            ag.targetZ = 0.8;
             ag.stateTimer = 10.0;
           } else if (rand < 0.7) {
             ag.state = "stretching";
             ag.stateTimer = 5.5;
           } else {
             ag.state = "chatting";
-            ag.targetX = ag.deskX + (idx % 2 === 0 ? 2.5 : -2.5);
-            ag.targetZ = 2.0;
+            ag.targetX = ag.deskX + (idx % 2 === 0 ? 2.0 : -2.0);
+            ag.targetZ = 2.2;
             ag.stateTimer = 7.0;
           }
         } else {
           ag.state = "desk";
           ag.targetX = ag.deskX;
-          ag.targetZ = 1.4;
+          ag.targetZ = 1.35;
           ag.stateTimer = Math.random() * 14 + 6;
         }
       }
@@ -568,7 +571,7 @@ function animate() {
       if (isExecuting && ag.state !== "desk") {
         ag.state = "desk";
         ag.targetX = ag.deskX;
-        ag.targetZ = 1.4;
+        ag.targetZ = 1.35;
       }
     }
 
@@ -583,6 +586,7 @@ function animate() {
       ag.root.position.x += (dx / dist) * walkSpeed;
       ag.root.position.z += (dz / dist) * walkSpeed;
 
+      // Face walking direction
       const targetAngle = Math.atan2(dx, dz);
       ag.root.rotation.y += (targetAngle - ag.root.rotation.y) * 0.15;
 
@@ -596,16 +600,20 @@ function animate() {
       ag.pelvis.position.y = 1.6 + Math.abs(Math.sin(ag.walkCycle * 2)) * 0.08;
       ag.headGroup.rotation.x = Math.sin(ag.walkCycle * 2) * 0.04;
     } else {
-      // --- SEATED / STANDING ---
-      ag.root.rotation.y += (0 - ag.root.rotation.y) * 0.1;
-
+      // --- STATIONARY (Facing -Z towards desk when at desk) ---
       if (ag.state === "desk") {
-        // PROPER SEATING HEIGHT (Pelvis sits on cushion at y = 1.48, Torso rises above table)
-        ag.pelvis.position.y = 1.48;
-        ag.leftLegPivot.rotation.x = -1.45;
-        ag.rightLegPivot.rotation.x = -1.45;
+        ag.root.rotation.y += (0 - ag.root.rotation.y) * 0.15; // Face straight towards desk (-Z)
+        ag.pelvis.position.y = 1.46; // On chair cushion
+
+        // Thighs project forward towards -Z (under desk), shins drop down
+        ag.leftLegPivot.rotation.x = 1.45;
+        ag.rightLegPivot.rotation.x = 1.45;
+
+        // Arms reach forward onto desk top
+        ag.leftArmPivot.rotation.x = -0.92;
+        ag.rightArmPivot.rotation.x = -0.92;
       } else {
-        // STANDING HEIGHT
+        // Standing at coffee counter or chatting
         ag.pelvis.position.y = 1.6;
         ag.leftLegPivot.rotation.x = 0;
         ag.rightLegPivot.rotation.x = 0;
@@ -615,27 +623,28 @@ function animate() {
       ag.headGroup.position.y = 1.72 + Math.sin(time * 2 + idx) * 0.03;
 
       if (isExecuting) {
-        // Active Fast Typing on Desk
-        ag.leftArmPivot.rotation.x = 0.95 + Math.sin(time * 20) * 0.15;
-        ag.rightArmPivot.rotation.x = 0.95 + Math.cos(time * 20) * 0.15;
-        ag.headGroup.rotation.x = 0.22 + Math.sin(time * 8) * 0.04;
+        // Fast Typing on Laptop (-Z forward towards keyboard)
+        ag.leftArmPivot.rotation.x = -0.95 + Math.sin(time * 20) * 0.15;
+        ag.rightArmPivot.rotation.x = -0.95 + Math.cos(time * 20) * 0.15;
+        ag.headGroup.rotation.x = -0.22 + Math.sin(time * 8) * 0.04;
         deskSpots[idx].intensity = 1.4;
       } else if (ag.state === "stretching") {
         // Standing and stretching arms up
-        ag.leftArmPivot.rotation.x = -1.4 + Math.sin(time * 3) * 0.2;
-        ag.rightArmPivot.rotation.x = -1.4 + Math.sin(time * 3) * 0.2;
-        ag.headGroup.rotation.x = -0.35 + Math.sin(time * 2) * 0.1;
+        ag.leftArmPivot.rotation.x = 1.4 + Math.sin(time * 3) * 0.2;
+        ag.rightArmPivot.rotation.x = 1.4 + Math.sin(time * 3) * 0.2;
+        ag.headGroup.rotation.x = 0.35 + Math.sin(time * 2) * 0.1;
       } else if (ag.state === "coffee") {
-        // Sipping coffee at espresso counter
-        ag.leftArmPivot.rotation.x = 0.4;
-        ag.rightArmPivot.rotation.x = 1.35 + Math.sin(time * 1.8) * 0.18;
-        ag.headGroup.rotation.x = 0.12 + Math.sin(time * 1.8) * 0.1;
+        // Sipping coffee at espresso counter (face counter at -X)
+        ag.root.rotation.y += (-Math.PI / 2 - ag.root.rotation.y) * 0.15;
+        ag.leftArmPivot.rotation.x = -0.4;
+        ag.rightArmPivot.rotation.x = -1.35 + Math.sin(time * 1.8) * 0.18;
+        ag.headGroup.rotation.x = -0.12 + Math.sin(time * 1.8) * 0.1;
       } else {
         // Relaxed Desk Work
-        ag.leftArmPivot.rotation.x = 0.85 + Math.sin(time * 2 + idx) * 0.04;
-        ag.rightArmPivot.rotation.x = 0.85 + Math.cos(time * 2 + idx) * 0.04;
+        ag.leftArmPivot.rotation.x = -0.85 + Math.sin(time * 2 + idx) * 0.04;
+        ag.rightArmPivot.rotation.x = -0.85 + Math.cos(time * 2 + idx) * 0.04;
         ag.headGroup.rotation.y = Math.sin(time * 0.6 + idx * 1.2) * 0.18;
-        ag.headGroup.rotation.x = Math.sin(time * 0.4 + idx) * 0.06;
+        ag.headGroup.rotation.x = -0.1 + Math.sin(time * 0.4 + idx) * 0.06;
       }
     }
 
