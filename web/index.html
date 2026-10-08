@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🐠 Virtual Office: 3D Minimal AI Agent Team</title>
+  <title>🐠 3D Minimal AI Agent Office | Fish Shop TikTok Creator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <!-- Three.js and OrbitControls for 3D Minimal Niche Platform -->
+  <script src="three.min.js"></script>
+  <script src="OrbitControls.js"></script>
 </head>
 <body>
   <div class="app-layout">
@@ -16,44 +19,47 @@
       <div class="brand">
         <div class="brand-badge">
           <span class="pulse-dot"></span>
-          <span>LIVE VIRTUAL OFFICE</span>
+          <span>3D MINIMAL NICHE HQ</span>
         </div>
-        <h1>🐠 Aquatic 3D Creator Team</h1>
+        <h1>🐠 Aquatic AI Creator Team</h1>
+      </div>
+      <div class="office-controls-hint">
+        <span class="hint-tag">🖱️ คลิกหมุน 3D ได้ 360° / สกรอลล์ซูม</span>
       </div>
       <div class="office-stats">
         <div class="stat-pill"><span class="icon">🤖</span> 4 Agents Active</div>
-        <div class="stat-pill"><span class="icon">✨</span> 3D Minimal Engine</div>
-        <div class="stat-pill"><span class="icon">📱</span> TikTok Retention Mode</div>
+        <div class="stat-pill"><span class="icon">🎬</span> Real Filming Mode</div>
       </div>
     </header>
 
     <!-- Main Workspace Grid -->
     <main class="main-content">
-      <!-- Left Column: Virtual Office Simulation Screen -->
+      <!-- Left Column: 3D Minimal Office Viewport -->
       <section class="simulation-pane">
         <div class="pane-header">
           <div class="header-title">
             <span class="room-icon">🏢</span>
-            <h2>HQ Virtual Office Simulation</h2>
+            <h2>3D Minimalist Office Simulation</h2>
           </div>
           <div class="room-legend">
-            <span class="badge badge-strategist">Strategist</span>
-            <span class="badge badge-scriptwriter">Scriptwriter</span>
-            <span class="badge badge-art">Art Director</span>
-            <span class="badge badge-qa">QA Auditor</span>
+            <span class="badge badge-strategist">🧠 Strategist</span>
+            <span class="badge badge-scriptwriter">✍️ Scriptwriter</span>
+            <span class="badge badge-shot">🎬 Shot Director</span>
+            <span class="badge badge-qa">📊 QA Auditor</span>
           </div>
         </div>
 
-        <!-- The Isometric Office Canvas -->
-        <div class="office-viewport">
-          <canvas id="officeCanvas" width="900" height="520"></canvas>
-          
-          <!-- Live Activity Overlay Overlay -->
+        <!-- WebGL 3D Container -->
+        <div class="office-viewport" id="threeContainer">
+          <!-- Speech Bubbles Overlay -->
+          <div id="bubbleOverlay" class="bubble-overlay"></div>
+
+          <!-- Live Activity Bar -->
           <div class="live-activity-bar" id="activityBar">
             <div class="agent-avatar-mini" id="activeAgentMini">🧠</div>
             <div class="activity-text">
               <strong id="activeAgentName">Strategist Agent</strong>
-              <span id="activityStatus">กำลังสแกนหาเทรนด์ & วิเคราะห์ Pain Point...</span>
+              <span id="activityStatus">กำลังสแกนหาประเด็นที่คนเลี้ยงปลาสงสัย...</span>
             </div>
             <div class="activity-spinner"></div>
           </div>
@@ -61,16 +67,16 @@
 
         <!-- Quick Prompt / Topic Controller -->
         <div class="control-console">
-          <div class="console-label">🎯 เลือกโจทย์สร้างคอนเทนต์สำหรับร้านปลาของคุณ:</div>
+          <div class="console-label">🎯 เลือกโจทย์สร้างคลิป TikTok สำหรับร้านปลาของคุณ:</div>
           <div class="preset-chips">
-            <button class="chip active" data-topic="ปลานีออนไม่ยอมว่ายรวมฝูง">🐟 ปลานีออนไม่รวมฝูง</button>
-            <button class="chip" data-topic="3 ความเข้าใจผิดในการเลี้ยงปลากัด">🥊 ความลับปลากัด</button>
-            <button class="chip" data-topic="วิธีแก้น้ำขุ่นในตู้ปลาให้ใสวิ้งแบบมินิมอล">💧 แก้น้ำขุ่นถาวร</button>
-            <button class="chip" data-topic="จัดตู้ปลามินิมอลบนโต๊ะทำงาน สวยคลีน สบายตา">🌿 จัดตู้มินิมอลโต๊ะทำงาน</button>
+            <button class="chip active" data-topic="ทำไมปลานีออนไม่ยอมว่ายรวมฝูง และวิธีแก้">🐟 นีออนไม่รวมฝูง</button>
+            <button class="chip" data-topic="3 ความเข้าใจผิดในการเลี้ยงปลากัด ที่ทำให้ปลาป่วย">🥊 ปลากัดเลี้ยงผิดวิธี</button>
+            <button class="chip" data-topic="วิธีแก้น้ำขุ่นในตู้ปลาให้ใสวิ้ง ไม่ต้องล้างบ่อย">💧 แก้น้ำขุ่นถาวร</button>
+            <button class="chip" data-topic="จัดตู้ปลามินิมอลบนโต๊ะทำงาน สวยคลีน สบายตา">🌿 จัดตู้มินิมอลบนโต๊ะ</button>
           </div>
 
           <form id="generateForm" class="input-group">
-            <input type="text" id="topicInput" placeholder="หรือพิมพ์ชื่อปลา / ปัญหาที่ต้องการทำคลิป เช่น กุ้งแคระลอกคราบ..." value="ปลานีออนไม่ยอมว่ายรวมฝูง" required>
+            <input type="text" id="topicInput" placeholder="พิมพ์ชื่อปลา หรือ ปัญหาที่ต้องการถ่ายคลิป..." value="ทำไมปลานีออนไม่ยอมว่ายรวมฝูง และวิธีแก้" required>
             <button type="submit" id="startBtn" class="btn-primary">
               <span class="btn-icon">⚡</span>
               <span>สั่ง Agent เริ่มทำงาน</span>
@@ -84,11 +90,11 @@
         <div class="pane-header">
           <div class="header-title">
             <span class="room-icon">🎬</span>
-            <h2>TikTok Production Pack</h2>
+            <h2>TikTok Production Sheet (บทพากย์ & มุมกล้อง)</h2>
           </div>
           <div class="action-buttons">
             <button id="copyAllBtn" class="btn-outline btn-sm">📋 Copy All</button>
-            <button id="downloadMdBtn" class="btn-outline btn-sm">📥 Export .MD</button>
+            <button id="downloadMdBtn" class="btn-outline btn-sm">📥 Export .JSON</button>
           </div>
         </div>
 
@@ -96,8 +102,8 @@
           <!-- Placeholder state -->
           <div class="empty-state" id="emptyState">
             <div class="empty-icon">🐠</div>
-            <h3>ระบบพร้อมสร้างคอนเทนต์ 3D Minimal</h3>
-            <p>กดปุ่ม <strong>"สั่ง Agent เริ่มทำงาน"</strong> เพื่อดูตัวการ์ตูน Agent เดินไปทำงานตามสถานีต่างๆ และสร้างบทพากย์ + 3D Prompts แบบเรียลไทม์</p>
+            <h3>พร้อมสร้างไอเดีย & บทพากย์สำหรับถ่ายคลิปจริง</h3>
+            <p>กดปุ่ม <strong>"สั่ง Agent เริ่มทำงาน"</strong> เพื่อดูตัวการ์ตูน 3D ในออฟฟิศเดินไปทำงานตามแผนกต่างๆ แล้วสร้างบทพากย์ + ไกด์มุมกล้องให้ทันที</p>
           </div>
 
           <!-- Live Result Cards (Hidden by default) -->
@@ -116,19 +122,19 @@
               </div>
               <div class="score-breakdown">
                 <div class="metric-item">
-                  <span>🪝 Hook Impact</span>
+                  <span>🪝 3s Hook Impact</span>
                   <strong id="qaHookScore">9/10</strong>
                 </div>
                 <div class="metric-item">
-                  <span>⏳ Retention</span>
+                  <span>⏳ Retention Curve</span>
                   <strong id="qaRetentionScore">9/10</strong>
                 </div>
                 <div class="metric-item">
-                  <span>💬 Comments</span>
+                  <span>💬 Comment Trigger</span>
                   <strong id="qaCommentScore">9/10</strong>
                 </div>
                 <div class="metric-item">
-                  <span>🎨 3D Feasibility</span>
+                  <span>🎥 Filming Ease</span>
                   <strong id="qaVisualScore">10/10</strong>
                 </div>
               </div>
@@ -136,13 +142,13 @@
 
             <!-- Hook 3-Second Box -->
             <div class="hook-box">
-              <div class="hook-badge">⚡ 3-SECOND VIRAL HOOK</div>
+              <div class="hook-badge">⚡ 3-SECOND VIRAL HOOK (ประโยคเปิดคลิป)</div>
               <h3 id="scriptHookText">"ทำไมปลานีออนในตู้คุณ 'ไม่ยอมว่ายเป็นฝูง'?"</h3>
             </div>
 
             <!-- Scene Breakdown Accordion -->
             <div class="scenes-section">
-              <h4>🎙️ Scene Breakdown (บทพากย์ & 3D Prompts)</h4>
+              <h4>🎙️ Scene Breakdown (บทพากย์ที่คุณอ่าน & มุมกล้องที่ต้องถ่ายจริง)</h4>
               <div id="scenesList" class="scenes-list">
                 <!-- Injected via JavaScript -->
               </div>
@@ -153,13 +159,13 @@
               <h4>📝 TikTok Publishing Package</h4>
               
               <div class="pub-item">
-                <div class="pub-label">📌 Caption & Hashtags:</div>
+                <div class="pub-label">📌 Caption (แคปชันโพสต์):</div>
                 <div class="code-box" id="captionText"></div>
                 <button class="btn-copy-chip" onclick="copyText('captionText')">Copy Caption</button>
               </div>
 
               <div class="pub-item">
-                <div class="pub-label">💬 Pinned Comment (คำถามเปิดเพื่อดึง Engagement):</div>
+                <div class="pub-label">💬 Pinned Comment (คำถามสำหรับปักหมุดกระตุ้นคอมเมนต์):</div>
                 <div class="quote-box" id="pinnedCommentText"></div>
                 <button class="btn-copy-chip" onclick="copyText('pinnedCommentText')">Copy Pinned Comment</button>
               </div>

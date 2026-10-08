@@ -18,7 +18,7 @@ def format_production_pack_markdown(pack: ProductionPack) -> str:
     lines.append(f"- **🪝 3-Second Hook:** > **\"{script.hook_3sec}\"**")
     lines.append("")
     lines.append("---")
-    lines.append("## 🎙️ Scene Breakdown (บทพากย์ & 3D Prompts)")
+    lines.append("## 🎙️ Scene Breakdown (บทพากย์ & มุมกล้องถ่ายทำจริง)")
     lines.append("")
 
     for s in script.scenes:
@@ -27,8 +27,8 @@ def format_production_pack_markdown(pack: ProductionPack) -> str:
         lines.append(f"  > \"{s.voiceover_th}\"")
         lines.append(f"- **📱 ข้อความบนจอ (On-Screen Text):** `{s.on_screen_text}`")
         lines.append(f"- **👁️ คำอธิบายภาพ (Visual Action):** {s.visual_action_description}")
-        lines.append(f"- **🎨 3D Minimal Prompt (Copy วางใน Midjourney/Flux):**")
-        lines.append(f"  ```text\n  {s.prompt_3d_minimal}\n  ```")
+        lines.append(f"- **🎥 คำแนะนำมุมกล้องสำหรับถ่ายจริง (Shot Guide):**")
+        lines.append(f"  `{s.camera_shot_guide}`")
         lines.append("")
 
     lines.append("---")
@@ -48,13 +48,13 @@ def format_production_pack_markdown(pack: ProductionPack) -> str:
     lines.append(f"  - 🪝 3-Second Hook Impact: `{qa.hook_score}/10`")
     lines.append(f"  - ⏳ Retention Potential: `{qa.retention_score}/10`")
     lines.append(f"  - 💬 Comment Trigger: `{qa.comment_trigger_score}/10`")
-    lines.append(f"  - 🎨 3D Minimal Feasibility: `{qa.visual_3d_feasibility}/10`")
+    lines.append(f"  - 🎥 Filming Feasibility: `{qa.filming_feasibility}/10`")
     lines.append("")
     lines.append("**🌟 จุดเด่นของคลิปนี้:**")
     for st in qa.strengths:
         lines.append(f"- {st}")
     lines.append("")
-    lines.append("**💡 ทริคเสริมตอนผลิตจริง:**")
+    lines.append("**💡 ทริคเสริมตอนถ่ายและตัดต่อจริง:**")
     for imp in qa.improvement_suggestions:
         lines.append(f"- {imp}")
     lines.append("")

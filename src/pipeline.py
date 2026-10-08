@@ -12,11 +12,12 @@ if sys.stdout and hasattr(sys.stdout, "reconfigure"):
         sys.stderr.reconfigure(encoding="utf-8")
     except Exception:
         pass
+
 from .models import ProductionPack
 from .llm import LLMClient
 from .agents.strategist import StrategistAgent
 from .agents.scriptwriter import ScriptwriterAgent
-from .agents.art_director import ArtDirectorAgent
+from .agents.shot_director import ShotDirectorAgent
 from .agents.qa_evaluator import QAEvaluatorAgent
 from .formatters import format_production_pack_markdown
 
@@ -24,17 +25,16 @@ class ContentCreationPipeline:
     """
     Main Orchestrator for the 4-Agent Content Creation Team.
     Flow:
-    Strategist -> Scriptwriter -> Art Director -> QA Evaluator (with revision loop if needed) -> Production Pack
+    Strategist -> Scriptwriter -> Shot Director -> QA Evaluator -> Production Pack
     """
-    def __init__(self, brand_config_path: str = "config/brand_dna.yaml", style_guide_path: str = "config/3d_style_guide.yaml"):
+    def __init__(self, brand_config_path: str = "config/brand_dna.yaml"):
         self.brand_config = self._load_yaml(brand_config_path)
-        self.style_guide = self._load_yaml(style_guide_path)
         self.llm_client = LLMClient()
 
         # Initialize Agents
         self.strategist = StrategistAgent(self.brand_config, self.llm_client)
         self.scriptwriter = ScriptwriterAgent(self.brand_config, self.llm_client)
-        self.art_director = ArtDirectorAgent(self.style_guide, self.llm_client)
+        self.shot_director = ShotDirectorAgent(self.brand_config, self.llm_client)
         self.qa_evaluator = QAEvaluatorAgent(self.brand_config, self.llm_client)
 
     def _load_yaml(self, path: str) -> Dict[str, Any]:
@@ -57,8 +57,8 @@ class ContentCreationPipeline:
             print(f"\n✍️ [Agent 2: Scriptwriter] กำลังเขียนบทพากย์ & วางจังหวะ Hook (รอบที่ {revision_count + 1})...")
             script = self.scriptwriter.generate_script(concept, feedback_notes)
 
-            print(f"\n🎨 [Agent 3: Art Director] แปลงบทเป็น Master 3D Minimal Prompts...")
-            script = self.art_director.enrich_script_with_3d_prompts(script)
+            print(f"\n🎬 [Agent 3: Shot Director] วางมุมกล้องและแนวทางการถ่ายทำจริงในร้าน...")
+            script = self.shot_director.enrich_script_with_shot_guide(script)
 
             print(f"\n📊 [Agent 4: QA Evaluator] ตรวจสอบคะแนน Algorithm & Engagement...")
             qa_report = self.qa_evaluator.evaluate(script)
@@ -71,7 +71,7 @@ class ContentCreationPipeline:
             feedback_notes = " ".join(qa_report.improvement_suggestions)
             print(f"   🔄 กำลังส่งกลับไปปรับแก้ตามข้อเสนอแนะ: {feedback_notes}")
 
-        project_id = f"FISH3D-{datetime.datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:4].upper()}"
+        project_id = f"FISH-{datetime.datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:4].upper()}"
         created_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         production_pack = ProductionPack(

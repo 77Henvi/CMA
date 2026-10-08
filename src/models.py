@@ -13,8 +13,8 @@ class ScriptScene(BaseModel):
     time_range: str = Field(description="ช่วงเวลา เช่น 00:00 - 00:03")
     voiceover_th: str = Field(description="บทพูดพากย์ภาษาไทย เป็นธรรมชาติ มีคำเน้นเสียง")
     on_screen_text: str = Field(description="ข้อความสั้นๆ บนหน้าจอ (เน้นตัวโต อ่านง่าย)")
-    visual_action_description: str = Field(description="คำอธิบายภาพในฉากว่าเกิดอะไรขึ้น")
-    prompt_3d_minimal: Optional[str] = Field(default="", description="Prompt 3D Minimal ภาษาอังกฤษสำหรับนำไปใส่ Midjourney/Flux")
+    visual_action_description: str = Field(description="สิ่งที่เกิดขึ้นในคลิป")
+    camera_shot_guide: str = Field(default="", description="คำแนะนำมุมกล้องสำหรับถ่ายจริง (เช่น ถ่าย Macro เจาะเกล็ดปลา, มุม Top-down)")
 
 class TikTokScript(BaseModel):
     concept: ContentConcept
@@ -28,7 +28,7 @@ class QAFeedback(BaseModel):
     hook_score: int = Field(description="คะแนน Hook 3 วิแรก (1-10)", ge=1, le=10)
     retention_score: int = Field(description="คะแนนความน่าติดตามต่อเนื่อง (1-10)", ge=1, le=10)
     comment_trigger_score: int = Field(description="คะแนนการกระตุ้นให้คอมเมนต์ (1-10)", ge=1, le=10)
-    visual_3d_feasibility: int = Field(description="คะแนนความเหมาะสมกับสไตล์ 3D Minimal (1-10)", ge=1, le=10)
+    filming_feasibility: int = Field(description="คะแนนความง่ายและสวยงามในการถ่ายทำจริง (1-10)", ge=1, le=10)
     overall_score: float = Field(description="คะแนนเฉลี่ยรวม")
     passed: bool = Field(description="ผ่านเกณฑ์คุณภาพหรือไม่ (>= 8.0)")
     strengths: List[str] = Field(default_factory=list, description="จุดเด่นของคลิปนี้")
