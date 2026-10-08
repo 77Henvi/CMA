@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐠 Virtual Office: 3D Minimal AI Agent Team</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Top Navigation -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-badge">
+          <span class="pulse-dot"></span>
+          <span>LIVE VIRTUAL OFFICE</span>
+        </div>
+        <h1>🐠 Aquatic 3D Creator Team</h1>
+      </div>
+      <div class="office-stats">
+        <div class="stat-pill"><span class="icon">🤖</span> 4 Agents Active</div>
+        <div class="stat-pill"><span class="icon">✨</span> 3D Minimal Engine</div>
+        <div class="stat-pill"><span class="icon">📱</span> TikTok Retention Mode</div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="main-content">
+      <!-- Left Column: Virtual Office Simulation Screen -->
+      <section class="simulation-pane">
+        <div class="pane-header">
+          <div class="header-title">
+            <span class="room-icon">🏢</span>
+            <h2>HQ Virtual Office Simulation</h2>
+          </div>
+          <div class="room-legend">
+            <span class="badge badge-strategist">Strategist</span>
+            <span class="badge badge-scriptwriter">Scriptwriter</span>
+            <span class="badge badge-art">Art Director</span>
+            <span class="badge badge-qa">QA Auditor</span>
+          </div>
+        </div>
+
+        <!-- The Isometric Office Canvas -->
+        <div class="office-viewport">
+          <canvas id="officeCanvas" width="900" height="520"></canvas>
+          
+          <!-- Live Activity Overlay Overlay -->
+          <div class="live-activity-bar" id="activityBar">
+            <div class="agent-avatar-mini" id="activeAgentMini">🧠</div>
+            <div class="activity-text">
+              <strong id="activeAgentName">Strategist Agent</strong>
+              <span id="activityStatus">กำลังสแกนหาเทรนด์ & วิเคราะห์ Pain Point...</span>
+            </div>
+            <div class="activity-spinner"></div>
+          </div>
+        </div>
+
+        <!-- Quick Prompt / Topic Controller -->
+        <div class="control-console">
+          <div class="console-label">🎯 เลือกโจทย์สร้างคอนเทนต์สำหรับร้านปลาของคุณ:</div>
+          <div class="preset-chips">
+            <button class="chip active" data-topic="ปลานีออนไม่ยอมว่ายรวมฝูง">🐟 ปลานีออนไม่รวมฝูง</button>
+            <button class="chip" data-topic="3 ความเข้าใจผิดในการเลี้ยงปลากัด">🥊 ความลับปลากัด</button>
+            <button class="chip" data-topic="วิธีแก้น้ำขุ่นในตู้ปลาให้ใสวิ้งแบบมินิมอล">💧 แก้น้ำขุ่นถาวร</button>
+            <button class="chip" data-topic="จัดตู้ปลามินิมอลบนโต๊ะทำงาน สวยคลีน สบายตา">🌿 จัดตู้มินิมอลโต๊ะทำงาน</button>
+          </div>
+
+          <form id="generateForm" class="input-group">
+            <input type="text" id="topicInput" placeholder="หรือพิมพ์ชื่อปลา / ปัญหาที่ต้องการทำคลิป เช่น กุ้งแคระลอกคราบ..." value="ปลานีออนไม่ยอมว่ายรวมฝูง" required>
+            <button type="submit" id="startBtn" class="btn-primary">
+              <span class="btn-icon">⚡</span>
+              <span>สั่ง Agent เริ่มทำงาน</span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Right Column: Production Pack Dashboard Output -->
+      <section class="output-pane">
+        <div class="pane-header">
+          <div class="header-title">
+            <span class="room-icon">🎬</span>
+            <h2>TikTok Production Pack</h2>
+          </div>
+          <div class="action-buttons">
+            <button id="copyAllBtn" class="btn-outline btn-sm">📋 Copy All</button>
+            <button id="downloadMdBtn" class="btn-outline btn-sm">📥 Export .MD</button>
+          </div>
+        </div>
+
+        <div class="output-scrollable" id="outputContainer">
+          <!-- Placeholder state -->
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon">🐠</div>
+            <h3>ระบบพร้อมสร้างคอนเทนต์ 3D Minimal</h3>
+            <p>กดปุ่ม <strong>"สั่ง Agent เริ่มทำงาน"</strong> เพื่อดูตัวการ์ตูน Agent เดินไปทำงานตามสถานีต่างๆ และสร้างบทพากย์ + 3D Prompts แบบเรียลไทม์</p>
+          </div>
+
+          <!-- Live Result Cards (Hidden by default) -->
+          <div class="result-content hidden" id="resultContent">
+            <!-- QA Scorecard Badge -->
+            <div class="qa-score-card">
+              <div class="score-main">
+                <div class="score-circle">
+                  <span id="qaOverallScore">9.2</span>
+                  <small>/10</small>
+                </div>
+                <div>
+                  <div class="qa-title">TikTok Algorithm Audit</div>
+                  <div class="qa-status-pass" id="qaStatusText">✅ ผ่านเกณฑ์มาตรฐานความไวรัล</div>
+                </div>
+              </div>
+              <div class="score-breakdown">
+                <div class="metric-item">
+                  <span>🪝 Hook Impact</span>
+                  <strong id="qaHookScore">9/10</strong>
+                </div>
+                <div class="metric-item">
+                  <span>⏳ Retention</span>
+                  <strong id="qaRetentionScore">9/10</strong>
+                </div>
+                <div class="metric-item">
+                  <span>💬 Comments</span>
+                  <strong id="qaCommentScore">9/10</strong>
+                </div>
+                <div class="metric-item">
+                  <span>🎨 3D Feasibility</span>
+                  <strong id="qaVisualScore">10/10</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hook 3-Second Box -->
+            <div class="hook-box">
+              <div class="hook-badge">⚡ 3-SECOND VIRAL HOOK</div>
+              <h3 id="scriptHookText">"ทำไมปลานีออนในตู้คุณ 'ไม่ยอมว่ายเป็นฝูง'?"</h3>
+            </div>
+
+            <!-- Scene Breakdown Accordion -->
+            <div class="scenes-section">
+              <h4>🎙️ Scene Breakdown (บทพากย์ & 3D Prompts)</h4>
+              <div id="scenesList" class="scenes-list">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
+
+            <!-- TikTok Publishing Essentials -->
+            <div class="publishing-box">
+              <h4>📝 TikTok Publishing Package</h4>
+              
+              <div class="pub-item">
+                <div class="pub-label">📌 Caption & Hashtags:</div>
+                <div class="code-box" id="captionText"></div>
+                <button class="btn-copy-chip" onclick="copyText('captionText')">Copy Caption</button>
+              </div>
+
+              <div class="pub-item">
+                <div class="pub-label">💬 Pinned Comment (คำถามเปิดเพื่อดึง Engagement):</div>
+                <div class="quote-box" id="pinnedCommentText"></div>
+                <button class="btn-copy-chip" onclick="copyText('pinnedCommentText')">Copy Pinned Comment</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
