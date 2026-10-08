@@ -1,16 +1,18 @@
 /**
- * 3D Minimal Niche Virtual Office Platform (Three.js WebGL Engine)
+ * 3D Architectural Creative Studio (Three.js WebGL Engine)
+ * Inspired by Japanese / Scandinavian Minimalist Studio Aesthetics
  */
 
 const container = document.getElementById("threeContainer");
 
-// --- 1. Three.js Scene Setup ---
+// --- 1. Three.js Scene & Camera Setup ---
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0e141d);
-scene.fog = new THREE.FogExp2(0x0e141d, 0.02);
+scene.background = new THREE.Color(0xf6f3ec); // Warm off-white from image
+scene.fog = new THREE.FogExp2(0xf6f3ec, 0.015);
 
-const camera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 0.1, 1000);
-camera.position.set(18, 22, 24);
+const camera = new THREE.PerspectiveCamera(34, container.clientWidth / container.clientHeight, 0.1, 1000);
+// Side-angled architectural perspective matching the reference image
+camera.position.set(0, 10, 32);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
@@ -22,298 +24,318 @@ container.appendChild(renderer.domElement);
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.target.set(0, 1.5, 0);
-controls.maxPolarAngle = Math.PI / 2.1; // Don't flip below floor
-controls.minDistance = 10;
-controls.maxDistance = 45;
+controls.target.set(0, 3.5, 0);
+controls.maxPolarAngle = Math.PI / 2.05;
+controls.minDistance = 12;
+controls.maxDistance = 55;
 
-// --- 2. 3D Minimal Studio Lighting ---
-const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.85);
+// --- 2. Warm Studio Lighting ---
+const ambientLight = new THREE.AmbientLight(0xfffbf2, 0.95);
 scene.add(ambientLight);
 
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.6);
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0xe2ded4, 0.7);
 scene.add(hemiLight);
 
-const mainSun = new THREE.DirectionalLight(0xfff3e0, 1.2);
-mainSun.position.set(15, 25, 15);
-mainSun.castShadow = true;
-mainSun.shadow.mapSize.width = 2048;
-mainSun.shadow.mapSize.height = 2048;
-mainSun.shadow.camera.near = 0.5;
-mainSun.shadow.camera.far = 60;
-mainSun.shadow.camera.left = -15;
-mainSun.shadow.camera.right = 15;
-mainSun.shadow.camera.top = 15;
-mainSun.shadow.camera.bottom = -15;
-mainSun.shadow.bias = -0.0005;
-scene.add(mainSun);
+const sunLight = new THREE.DirectionalLight(0xfff6e6, 1.1);
+sunLight.position.set(12, 28, 20);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.width = 2048;
+sunLight.shadow.mapSize.height = 2048;
+sunLight.shadow.camera.near = 0.5;
+sunLight.shadow.camera.far = 70;
+sunLight.shadow.camera.left = -25;
+sunLight.shadow.camera.right = 25;
+sunLight.shadow.camera.top = 20;
+sunLight.shadow.camera.bottom = -10;
+sunLight.shadow.bias = -0.0004;
+scene.add(sunLight);
 
-const blueFill = new THREE.DirectionalLight(0x38bdf8, 0.5);
-blueFill.position.set(-15, 10, -15);
-scene.add(blueFill);
+// Soft backlight
+const backLight = new THREE.DirectionalLight(0xd9e2ec, 0.4);
+backLight.position.set(-15, 12, -15);
+scene.add(backLight);
 
-// --- 3. 3D Clay & Pastel Materials ---
-const clayMat = (color, roughness = 0.6) => new THREE.MeshStandardMaterial({ color, roughness, metalness: 0.05 });
-const floorMat = new THREE.MeshStandardMaterial({ color: 0x161f2e, roughness: 0.8, metalness: 0.1 });
-const glassMat = new THREE.MeshPhysicalMaterial({
-  color: 0x99f6e4,
-  transmission: 0.85,
-  opacity: 1,
-  transparent: true,
-  roughness: 0.1,
-  ior: 1.33
-});
+// --- 3. Material Palette (Matte Architectural Clay & Wood) ---
+const mat = (color, roughness = 0.65) => new THREE.MeshStandardMaterial({ color, roughness, metalness: 0.02 });
 
-// --- 4. Build 3D Minimal Office Floor ---
-const floorGeo = new THREE.BoxGeometry(20, 0.6, 16);
-const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-floorMesh.position.y = -0.3;
-floorMesh.receiveShadow = true;
-scene.add(floorMesh);
+const deskTopMat = mat(0xffffff, 0.3); // Sleek white studio table
+const deskWoodMat = mat(0xd7ccc8, 0.8); // Warm oak drawers
+const metalLegMat = mat(0x3e3c38, 0.4); // Charcoal steel legs
+const wallMat = mat(0xefeae1, 0.9); // Back wall
+const floorMat = mat(0xf3efe6, 0.85); // Floor
+const tealChairMat = mat(0x3b5c5e, 0.5); // Teal ergonomic chair
+const darkChairMat = mat(0x2f3640, 0.6); // Slate black chair
 
-// Base skirting glow line
-const ringGeo = new THREE.RingGeometry(0.2, 10, 32);
-const gridHelper = new THREE.GridHelper(19, 19, 0x38bdf8, 0x1e293b);
-gridHelper.position.y = 0.02;
-scene.add(gridHelper);
+// --- 4. Architectural Back Wall & Moodboards ---
+const wallGroup = new THREE.Group();
+wallGroup.position.set(0, 8, -5);
 
-// --- 5. Centerpiece: 3D Minimal Nano Aquarium ---
-const tankGroup = new THREE.Group();
-tankGroup.position.set(0, 0.8, 0);
+// Main backdrop panel
+const backWall = new THREE.Mesh(new THREE.PlaneGeometry(60, 24), wallMat);
+backWall.receiveShadow = true;
+wallGroup.add(backWall);
 
-// Glass Tank Box
-const tankGeo = new THREE.BoxGeometry(3.6, 2.4, 2.4);
-const tankMesh = new THREE.Mesh(tankGeo, glassMat);
-tankGroup.add(tankMesh);
-
-// Substrate (Sand)
-const sandGeo = new THREE.BoxGeometry(3.4, 0.3, 2.2);
-const sandMesh = new THREE.Mesh(sandGeo, clayMat(0xe5e5da, 0.9));
-sandMesh.position.y = -1.0;
-sandGroup_add = tankGroup.add(sandMesh);
-
-// Water glow interior
-const waterGeo = new THREE.BoxGeometry(3.3, 1.8, 2.1);
-const waterMat = new THREE.MeshStandardMaterial({
-  color: 0x06b6d4,
-  transparent: true,
-  opacity: 0.25,
-  roughness: 0.1
-});
-const waterMesh = new THREE.Mesh(waterGeo, waterMat);
-waterMesh.position.y = -0.1;
-tankGroup.add(waterMesh);
-
-// Desk for aquarium
-const aqDeskGeo = new THREE.CylinderGeometry(2.4, 2.6, 1.6, 32);
-const aqDesk = new THREE.Mesh(aqDeskGeo, clayMat(0x1e293b, 0.7));
-aqDesk.position.set(0, 0, 0);
-aqDesk.castShadow = true;
-aqDesk.receiveShadow = true;
-scene.add(aqDesk);
-scene.add(tankGroup);
-
-// Animated 3D Fishes
-const fishMeshes = [];
-const fishData = [
-  { angle: 0, speed: 0.02, radius: 1.1, y: 0.8, color: 0x00e5ff },
-  { angle: 1.5, speed: 0.016, radius: 0.9, y: 1.1, color: 0x00e5ff },
-  { angle: 3.2, speed: -0.022, radius: 1.2, y: 0.6, color: 0xff6b6b },
-  { angle: 4.8, speed: 0.018, radius: 0.8, y: 1.3, color: 0x00e5ff }
+// Pinned Sketches & Frames (as seen in the reference image)
+const sketches = [
+  { x: -16, y: 3, w: 2.2, h: 2.8, color: 0xdfd7cb },
+  { x: -9, y: 4.5, w: 3.5, h: 2.5, color: 0xe6dfd5 },
+  { x: -2, y: 3.8, w: 2.8, h: 3.6, color: 0xeae4db },
+  { x: 6, y: 4.2, w: 4.5, h: 3.0, color: 0xe2dad0 },
+  { x: 14, y: 3.5, w: 3.0, h: 4.0, color: 0xdfd8cd }
 ];
 
-fishData.forEach((fd) => {
-  const fGroup = new THREE.Group();
-  const bodyGeo = new THREE.ConeGeometry(0.12, 0.35, 8);
-  bodyGeo.rotateZ(Math.PI / 2);
-  const bodyMesh = new THREE.Mesh(bodyGeo, clayMat(fd.color, 0.4));
-  fGroup.add(bodyMesh);
-
-  // Red neon stripe
-  const stripeGeo = new THREE.BoxGeometry(0.18, 0.04, 0.05);
-  const stripeMesh = new THREE.Mesh(stripeGeo, clayMat(0xff3366, 0.3));
-  fGroup.add(stripeMesh);
-
-  tankGroup.add(fGroup);
-  fishMeshes.push({ group: fGroup, ...fd });
+sketches.forEach((s) => {
+  const f = new THREE.Mesh(new THREE.PlaneGeometry(s.w, s.h), mat(s.color, 0.9));
+  f.position.set(s.x, s.y, 0.05);
+  // Thin border
+  const border = new THREE.Mesh(new THREE.PlaneGeometry(s.w + 0.15, s.h + 0.15), mat(0x8d8276, 0.7));
+  border.position.set(s.x, s.y, 0.02);
+  wallGroup.add(border);
+  wallGroup.add(f);
 });
 
-// --- 6. Build 4 Minimal Workstations ---
-const stations = {
-  strategist: { x: -6.5, z: -4.5, color: 0x58a6ff, name: "Strategy Lounge" },
-  scriptwriter: { x: 6.5, z: -4.5, color: 0xe3b341, name: "Scripting Studio" },
-  shotDirector: { x: 6.5, z: 4.5, color: 0xff7b72, name: "Shot Director Bay" },
-  qaEvaluator: { x: -6.5, z: 4.5, color: 0x38d9a9, name: "QA Audit Hub" }
-};
+scene.add(wallGroup);
 
-function createDesk(x, z, accentColor) {
+// Floor
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = 0;
+floor.receiveShadow = true;
+scene.add(floor);
+
+// --- 5. Long Shared Collaborative Studio Desk ---
+const tableGroup = new THREE.Group();
+tableGroup.position.set(0, 0, 0);
+
+const tableLength = 26;
+const tableDepth = 3.2;
+const tableHeight = 3.0;
+
+// Table Top
+const tableTop = new THREE.Mesh(new THREE.BoxGeometry(tableLength, 0.2, tableDepth), deskTopMat);
+tableTop.position.set(0, tableHeight, 0);
+tableTop.castShadow = true;
+tableTop.receiveShadow = true;
+tableGroup.add(tableTop);
+
+// Steel Legs along the table
+const legPositionsX = [-12.5, -6.5, 0, 6.5, 12.5];
+legPositionsX.forEach((lx) => {
+  const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, tableHeight), metalLegMat);
+  leg1.position.set(lx, tableHeight / 2, -tableDepth / 2 + 0.2);
+  leg1.castShadow = true;
+  tableGroup.add(leg1);
+
+  const leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, tableHeight), metalLegMat);
+  leg2.position.set(lx, tableHeight / 2, tableDepth / 2 - 0.2);
+  leg2.castShadow = true;
+  tableGroup.add(leg2);
+});
+
+// Under-desk Cabinet Drawers (Warm Wood/Beige as in reference)
+const drawerPositionsX = [-10, -1, 8.5];
+drawerPositionsX.forEach((dx) => {
+  const cabinet = new THREE.Mesh(new THREE.BoxGeometry(2.4, 2.2, 2.4), deskWoodMat);
+  cabinet.position.set(dx, 1.1, 0);
+  cabinet.castShadow = true;
+  cabinet.receiveShadow = true;
+  tableGroup.add(cabinet);
+});
+
+// Desktop Monitors & Laptops
+const laptopMat = mat(0x3a3834, 0.3);
+const monitorMat = mat(0x2b2926, 0.2);
+const screenGlowMat = new THREE.MeshBasicMaterial({ color: 0xf0f6fc });
+
+const workstationX = [-8, -2.5, 3.5, 9];
+
+workstationX.forEach((wx, i) => {
+  // Laptop / Monitor
+  if (i === 0 || i === 2) {
+    // Sleek Desktop Monitor
+    const monStand = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.15, 0.6), metalLegMat);
+    monStand.position.set(wx, tableHeight + 0.3, -0.4);
+    const monScreen = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.1, 0.08), monitorMat);
+    monScreen.position.set(wx, tableHeight + 0.9, -0.4);
+    monScreen.castShadow = true;
+    const innerScreen = new THREE.Mesh(new THREE.PlaneGeometry(1.45, 0.95), screenGlowMat);
+    innerScreen.position.set(wx, tableHeight + 0.9, -0.35);
+    tableGroup.add(monStand);
+    tableGroup.add(monScreen);
+    tableGroup.add(innerScreen);
+  } else {
+    // Open Laptop
+    const base = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.04, 0.7), laptopMat);
+    base.position.set(wx, tableHeight + 0.12, 0);
+    const screen = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.65, 0.04), laptopMat);
+    screen.position.set(wx, tableHeight + 0.42, -0.32);
+    screen.rotation.x = -0.2;
+    tableGroup.add(base);
+    tableGroup.add(screen);
+  }
+
+  // Modern Desk Lamp (with warm spot glow)
+  const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.05), metalLegMat);
+  lampBase.position.set(wx + 1.2, tableHeight + 0.12, -0.6);
+  const lampPole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.2), metalLegMat);
+  lampPole.position.set(wx + 1.2, tableHeight + 0.7, -0.6);
+  lampPole.rotation.z = -0.2;
+  const lampHead = new THREE.Mesh(new THREE.ConeGeometry(0.25, 0.35, 16), metalLegMat);
+  lampHead.position.set(wx + 0.95, tableHeight + 1.2, -0.6);
+  lampHead.rotation.z = 0.5;
+  tableGroup.add(lampBase);
+  tableGroup.add(lampPole);
+  tableGroup.add(lampHead);
+
+  // Warm localized light
+  const deskSpot = new THREE.PointLight(0xffedd5, 0.6, 6);
+  deskSpot.position.set(wx + 0.9, tableHeight + 1.1, -0.4);
+  tableGroup.add(deskSpot);
+});
+
+// Centerpiece: Minimalist Nano Tank on Table (with glowing animated fish)
+const nanoTankGroup = new THREE.Group();
+nanoTankGroup.position.set(0.5, tableHeight + 0.9, -0.3);
+
+const tankGlass = new THREE.Mesh(
+  new THREE.BoxGeometry(2.4, 1.5, 1.5),
+  new THREE.MeshPhysicalMaterial({ color: 0x99f6e4, transmission: 0.9, opacity: 1, transparent: true, roughness: 0.05, ior: 1.33 })
+);
+nanoTankGroup.add(tankGlass);
+
+const nanoWater = new THREE.Mesh(
+  new THREE.BoxGeometry(2.2, 1.3, 1.3),
+  new THREE.MeshStandardMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.25 })
+);
+nanoTankGroup.add(nanoWater);
+
+// Animated nano fish
+const nanoFishes = [];
+for (let f = 0; f < 3; f++) {
+  const fish = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.22, 6), mat(f === 0 ? 0x00e5ff : 0xff7b72, 0.3));
+  fish.rotation.z = Math.PI / 2;
+  nanoTankGroup.add(fish);
+  nanoFishes.push({ mesh: fish, angle: f * 2.1, speed: 0.02 + f * 0.005, rad: 0.6 + f * 0.2, y: -0.2 + f * 0.2 });
+}
+tableGroup.add(nanoTankGroup);
+
+scene.add(tableGroup);
+
+// --- 6. Task Office Chairs (Teal & Dark Grey Ergonomic Chairs) ---
+function createOfficeChair(x, z, chairMaterial, rotationY = 0) {
   const group = new THREE.Group();
   group.position.set(x, 0, z);
+  group.rotation.y = rotationY;
 
-  // Clay Desk Table
-  const topGeo = new THREE.BoxGeometry(3.6, 0.25, 2.0);
-  const topMesh = new THREE.Mesh(topGeo, clayMat(0x1f2937, 0.5));
-  topMesh.position.y = 1.3;
-  topMesh.castShadow = true;
-  topMesh.receiveShadow = true;
-  group.add(topMesh);
+  // Wheel Base
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 0.1, 8), metalLegMat);
+  base.position.y = 0.2;
+  group.add(base);
 
-  // Legs
-  const legGeo = new THREE.CylinderGeometry(0.08, 0.08, 1.3);
-  const legPositions = [
-    [-1.6, 0.65, -0.8],
-    [1.6, 0.65, -0.8],
-    [-1.6, 0.65, 0.8],
-    [1.6, 0.65, 0.8]
-  ];
-  legPositions.forEach(([lx, ly, lz]) => {
-    const leg = new THREE.Mesh(legGeo, clayMat(0x374151));
-    leg.position.set(lx, ly, lz);
-    leg.castShadow = true;
-    group.add(leg);
-  });
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.2), metalLegMat);
+  pole.position.y = 0.8;
+  group.add(pole);
 
-  // Glowing station floor mat
-  const padGeo = new THREE.CylinderGeometry(2.4, 2.4, 0.05, 32);
-  const padMat = new THREE.MeshStandardMaterial({
-    color: accentColor,
-    transparent: true,
-    opacity: 0.15,
-    roughness: 0.9
-  });
-  const pad = new THREE.Mesh(padGeo, padMat);
-  pad.position.y = 0.03;
-  group.add(pad);
+  // Seat Cushion
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.25, 1.4), chairMaterial);
+  seat.position.y = 1.45;
+  seat.castShadow = true;
+  group.add(seat);
+
+  // Ergonomic Curved Backrest
+  const back = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.6, 0.18), chairMaterial);
+  back.position.set(0, 2.3, 0.65);
+  back.rotation.x = -0.08;
+  back.castShadow = true;
+  group.add(back);
 
   return group;
 }
 
-// 1. Strategy Station Props (Whiteboard & Tablet)
-const stratDesk = createDesk(stations.strategist.x, stations.strategist.z, stations.strategist.color);
-const boardGeo = new THREE.BoxGeometry(2.4, 1.6, 0.1);
-const boardMesh = new THREE.Mesh(boardGeo, clayMat(0xf8fafc, 0.3));
-boardMesh.position.set(0, 2.4, -0.8);
-stratDesk.add(boardMesh);
-scene.add(stratDesk);
+const chairs = [
+  createOfficeChair(-8, 1.4, darkChairMat, 0),
+  createOfficeChair(-2.5, 1.4, tealChairMat, -0.1),
+  createOfficeChair(3.5, 1.4, tealChairMat, 0.15),
+  createOfficeChair(9, 1.4, darkChairMat, -0.1)
+];
+chairs.forEach((c) => scene.add(c));
 
-// 2. Scriptwriting Station Props (Dual Monitors)
-const scriptDesk = createDesk(stations.scriptwriter.x, stations.scriptwriter.z, stations.scriptwriter.color);
-const monGeo = new THREE.BoxGeometry(1.2, 0.8, 0.08);
-const monMesh1 = new THREE.Mesh(monGeo, clayMat(0x0f172a, 0.2));
-monMesh1.position.set(-0.65, 1.85, -0.2);
-monMesh1.rotation.y = 0.2;
-const monMesh2 = new THREE.Mesh(monGeo, clayMat(0x0f172a, 0.2));
-monMesh2.position.set(0.65, 1.85, -0.2);
-monMesh2.rotation.y = -0.2;
-scriptDesk.add(monMesh1);
-scriptDesk.add(monMesh2);
-scene.add(scriptDesk);
-
-// 3. Shot Director Station Props (Tripod Camera & Ring Light)
-const shotDesk = createDesk(stations.shotDirector.x, stations.shotDirector.z, stations.shotDirector.color);
-const camBody = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.5), clayMat(0x111827));
-camBody.position.set(0, 1.8, 0);
-const camLens = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.3, 16), clayMat(0x374151));
-camLens.rotation.x = Math.PI / 2;
-camLens.position.set(0, 1.8, -0.35);
-const ringLight = new THREE.Mesh(new THREE.TorusGeometry(0.35, 0.04, 16, 32), clayMat(0xffedd5, 0.1));
-ringLight.position.set(0, 1.8, -0.5);
-shotDesk.add(camBody);
-shotDesk.add(camLens);
-shotDesk.add(ringLight);
-scene.add(shotDesk);
-
-// 4. QA Audit Hub Props (Server Rack & Radar)
-const qaDesk = createDesk(stations.qaEvaluator.x, stations.qaEvaluator.z, stations.qaEvaluator.color);
-const serverRack = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.2, 0.9), clayMat(0x111827));
-serverRack.position.set(0, 1.5, -0.4);
-qaDesk.add(serverRack);
-scene.add(qaDesk);
-
-// --- 7. Build 4 Cute 3D Clay Chibi Avatar Agents ---
-function createChibiAgent(color, label) {
+// --- 7. Create Humanoid 3D Characters (Architectural Studio Style) ---
+function createHumanoidAgent(outfitColor, hairColor, isWoman = false) {
   const group = new THREE.Group();
 
-  // Head (Smooth Clay Sphere)
-  const headGeo = new THREE.SphereGeometry(0.48, 24, 24);
-  const headMesh = new THREE.Mesh(headGeo, clayMat(0xffdec7, 0.6));
-  headMesh.position.y = 1.35;
-  headMesh.castShadow = true;
-  group.add(headMesh);
+  // Head
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 24, 24), mat(0xffdec7, 0.7));
+  head.position.y = 3.6;
+  head.castShadow = true;
+  group.add(head);
 
-  // Cute Eyes
-  const eyeGeo = new THREE.SphereGeometry(0.06, 12, 12);
-  const eyeMat = clayMat(0x111111, 0.2);
-  const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-  leftEye.position.set(-0.16, 1.38, 0.43);
-  const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-  rightEye.position.set(0.16, 1.38, 0.43);
-  group.add(leftEye);
-  group.add(rightEye);
+  // Hair
+  const hairGeo = isWoman
+    ? new THREE.SphereGeometry(0.46, 20, 20, 0, Math.PI * 2, 0, Math.PI / 1.5)
+    : new THREE.SphereGeometry(0.45, 20, 20, 0, Math.PI * 2, 0, Math.PI / 2);
+  const hair = new THREE.Mesh(hairGeo, mat(hairColor, 0.9));
+  hair.position.set(0, 3.68, 0.02);
+  hair.rotation.x = isWoman ? 0.2 : -0.1;
+  group.add(hair);
 
-  // Blushing Cheeks
-  const cheekGeo = new THREE.SphereGeometry(0.08, 12, 12);
-  const cheekMat = clayMat(0xff8a8a, 0.5);
-  const leftCheek = new THREE.Mesh(cheekGeo, cheekMat);
-  leftCheek.position.set(-0.28, 1.25, 0.38);
-  const rightCheek = new THREE.Mesh(cheekGeo, cheekMat);
-  rightCheek.position.set(0.28, 1.25, 0.38);
-  group.add(leftCheek);
-  group.add(rightCheek);
+  // Torso / Stylish Jacket / Cardigan
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.45, 1.2, 16), mat(outfitColor, 0.8));
+  torso.position.y = 2.6;
+  torso.castShadow = true;
+  group.add(torso);
 
-  // Clay Body (Capsule/Cylinder)
-  const bodyGeo = new THREE.CylinderGeometry(0.35, 0.45, 0.65, 24);
-  const bodyMesh = new THREE.Mesh(bodyGeo, clayMat(color, 0.5));
-  bodyMesh.position.y = 0.75;
-  bodyMesh.castShadow = true;
-  group.add(bodyMesh);
+  // Upper Legs (Seated)
+  const legMat = mat(0x2b2926, 0.8);
+  const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.24, 1.1), legMat);
+  leftLeg.position.set(-0.25, 1.6, -0.4);
+  const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.24, 1.1), legMat);
+  rightLeg.position.set(0.25, 1.6, -0.4);
+  group.add(leftLeg);
+  group.add(rightLeg);
 
-  // Feet
-  const footGeo = new THREE.SphereGeometry(0.14, 12, 12);
-  const footMat = clayMat(0x1e293b);
-  const leftFoot = new THREE.Mesh(footGeo, footMat);
-  leftFoot.position.set(-0.2, 0.2, 0.05);
-  const rightFoot = new THREE.Mesh(footGeo, footMat);
-  rightFoot.position.set(0.2, 0.2, 0.05);
-  group.add(leftFoot);
-  group.add(rightFoot);
+  // Lower Legs
+  const leftShin = new THREE.Mesh(new THREE.BoxGeometry(0.22, 1.2, 0.22), legMat);
+  leftShin.position.set(-0.25, 0.8, -0.85);
+  const rightShin = new THREE.Mesh(new THREE.BoxGeometry(0.22, 1.2, 0.22), legMat);
+  rightShin.position.set(0.25, 0.8, -0.85);
+  group.add(leftShin);
+  group.add(rightShin);
 
-  return group;
+  // Arms (Leaning / Typing towards desk)
+  const armMat = mat(outfitColor, 0.8);
+  const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.8, 0.18), armMat);
+  leftArm.position.set(-0.48, 2.6, -0.2);
+  leftArm.rotation.x = 0.8;
+  const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.8, 0.18), armMat);
+  rightArm.position.set(0.48, 2.6, -0.2);
+  rightArm.rotation.x = 0.8;
+  group.add(leftArm);
+  group.add(rightArm);
+
+  return { group, head, torso, leftArm, rightArm };
 }
 
-const agentCharacters = [
-  {
-    id: "strategist",
-    mesh: createChibiAgent(0x58a6ff, "Strategist"),
-    currentPos: new THREE.Vector3(stations.strategist.x, 0, stations.strategist.z + 1.6),
-    targetPos: new THREE.Vector3(stations.strategist.x, 0, stations.strategist.z + 1.6)
-  },
-  {
-    id: "scriptwriter",
-    mesh: createChibiAgent(0xe3b341, "Scriptwriter"),
-    currentPos: new THREE.Vector3(stations.scriptwriter.x, 0, stations.scriptwriter.z + 1.6),
-    targetPos: new THREE.Vector3(stations.scriptwriter.x, 0, stations.scriptwriter.z + 1.6)
-  },
-  {
-    id: "shotDirector",
-    mesh: createChibiAgent(0xff7b72, "Shot Director"),
-    currentPos: new THREE.Vector3(stations.shotDirector.x, 0, stations.shotDirector.z - 1.6),
-    targetPos: new THREE.Vector3(stations.shotDirector.x, 0, stations.shotDirector.z - 1.6)
-  },
-  {
-    id: "qaEvaluator",
-    mesh: createChibiAgent(0x38d9a9, "QA Auditor"),
-    currentPos: new THREE.Vector3(stations.qaEvaluator.x, 0, stations.qaEvaluator.z - 1.6),
-    targetPos: new THREE.Vector3(stations.qaEvaluator.x, 0, stations.qaEvaluator.z - 1.6)
-  }
+// 4 Agents based on character styling in image:
+// 1. Strategist (Dark coat / thoughtful researcher)
+// 2. Scriptwriter (Terracotta cardigan / creative writer)
+// 3. Shot Director (Olive-camel blazer / visual designer)
+// 4. QA Auditor (Oatmeal jacket / reviewer)
+const agentData = [
+  { id: "strategist", x: -8, outfit: 0x3d3835, hair: 0x221f1d, isWoman: false, name: "Strategist" },
+  { id: "scriptwriter", x: -2.5, outfit: 0x9a4c3e, hair: 0x8d5b34, isWoman: true, name: "Scriptwriter" },
+  { id: "shotDirector", x: 3.5, outfit: 0x7c7365, hair: 0x1f1d1b, isWoman: false, name: "Shot Director" },
+  { id: "qaEvaluator", x: 9, outfit: 0xb5a898, hair: 0x3a2c20, isWoman: false, name: "QA Auditor" }
 ];
 
-agentCharacters.forEach((ac) => {
-  ac.mesh.position.copy(ac.currentPos);
-  scene.add(ac.mesh);
+const agents = agentData.map((d) => {
+  const character = createHumanoidAgent(d.outfit, d.hair, d.isWoman);
+  character.group.position.set(d.x, 0, 1.3);
+  scene.add(character.group);
+  return { ...d, ...character, baseRotY: 0, currentRotY: 0 };
 });
 
-// --- 8. Animation Render Loop ---
+// --- 8. Lively Animation Loop ---
 let clock = new THREE.Clock();
 let activeAgentId = "idle";
 
@@ -321,31 +343,40 @@ function animate() {
   requestAnimationFrame(animate);
   const time = clock.getElapsedTime();
 
-  // 1. Update Fishes Swimming
-  fishMeshes.forEach((f) => {
+  // 1. Nano Fish Swimming
+  nanoFishes.forEach((f) => {
     f.angle += f.speed;
-    f.group.position.x = Math.cos(f.angle) * f.radius;
-    f.group.position.z = Math.sin(f.angle) * (f.radius * 0.7);
-    f.group.position.y = f.y + Math.sin(time * 3 + f.angle) * 0.1;
-    f.group.rotation.y = -f.angle + (f.speed > 0 ? Math.PI / 2 : -Math.PI / 2);
+    f.mesh.position.x = Math.cos(f.angle) * f.rad;
+    f.mesh.position.z = Math.sin(f.angle) * (f.rad * 0.7);
+    f.mesh.position.y = f.y + Math.sin(time * 3 + f.angle) * 0.08;
+    f.mesh.rotation.y = -f.angle + Math.PI / 2;
   });
 
-  // 2. Animate Chibi Agents (Walking & Bobbing)
-  agentCharacters.forEach((ac) => {
-    // Interpolate position
-    ac.currentPos.lerp(ac.targetPos, 0.08);
-    ac.mesh.position.copy(ac.currentPos);
+  // 2. Lively Agent Animations
+  agents.forEach((ag, idx) => {
+    const isWorking = activeAgentId === ag.id;
 
-    // Cute idle/working bobbing
-    const isWorking = activeAgentId === ac.id;
-    const bounceFreq = isWorking ? 10 : 3;
-    const bounceAmp = isWorking ? 0.12 : 0.03;
-    ac.mesh.position.y = Math.abs(Math.sin(time * bounceFreq)) * bounceAmp;
+    // Breathing & natural posture shifting
+    ag.torso.position.y = 2.6 + Math.sin(time * 2 + idx) * 0.025;
+    ag.head.position.y = 3.6 + Math.sin(time * 2 + idx) * 0.035;
 
-    // Look at center when walking
-    if (ac.currentPos.distanceTo(ac.targetPos) > 0.1) {
-      ac.mesh.lookAt(ac.targetPos.x, ac.mesh.position.y, ac.targetPos.z);
+    // Natural head nodding / looking around
+    ag.head.rotation.y = Math.sin(time * 0.8 + idx * 1.5) * 0.12;
+    ag.head.rotation.x = isWorking ? 0.2 + Math.sin(time * 8) * 0.05 : Math.sin(time * 0.5 + idx) * 0.05;
+
+    // Typing / Writing hand motions
+    if (isWorking) {
+      ag.leftArm.rotation.x = 0.8 + Math.sin(time * 16) * 0.12;
+      ag.rightArm.rotation.x = 0.8 + Math.cos(time * 16) * 0.12;
+      ag.group.position.y = Math.abs(Math.sin(time * 6)) * 0.06; // Active slight chair bounce
+    } else {
+      ag.leftArm.rotation.x = 0.8 + Math.sin(time * 1.5 + idx) * 0.03;
+      ag.rightArm.rotation.x = 0.8 + Math.cos(time * 1.5 + idx) * 0.03;
+      ag.group.position.y = 0;
     }
+
+    // Chair subtle swivel
+    chairs[idx].rotation.y = Math.sin(time * 0.6 + idx) * 0.06;
   });
 
   controls.update();
@@ -395,8 +426,8 @@ generateForm.addEventListener("submit", async (e) => {
   startBtn.disabled = true;
   startBtn.style.opacity = "0.6";
 
-  // Trigger 3D Agent Walk Animation
-  await run3DAgentSequence(topic);
+  // Trigger Lively Agent Animation Sequence
+  await runLivelyStudioSequence(topic);
 
   // Fetch from Python server
   try {
@@ -419,49 +450,31 @@ generateForm.addEventListener("submit", async (e) => {
   }
 
   activeAgentId = "idle";
-  setActivityStatus("🎉 ผลิตเสร็จสมบูรณ์!", "พร้อมนำบทไปอัดเสียง & ถ่ายคลิปจริงตามไกด์มุมกล้อง", "✅");
+  setActivityStatus("🎉 สตูดิโอผลิตคลิปเสร็จสมบูรณ์!", "พร้อมนำบทไปอัดเสียง & ถ่ายคลิปจริงตามไกด์มุมกล้อง", "✅");
   startBtn.disabled = false;
   startBtn.style.opacity = "1";
 });
 
-async function run3DAgentSequence(topic) {
-  // 1. Strategist
+async function runLivelyStudioSequence(topic) {
+  // 1. Strategist (The Researcher)
   activeAgentId = "strategist";
-  setActivityStatus("Strategist Agent", `วิเคราะห์ Pain Point & หา Hook ปังๆ: "${topic}"`, "🧠");
-  await sleep(1200);
+  setActivityStatus("Strategist Agent (นักกลยุทธ์)", `กำลังวิเคราะห์ Pain Point & หา Hook สำหรับ: "${topic}"`, "🧠");
+  await sleep(1400);
 
-  // Walk towards Scriptwriter
-  agentCharacters[0].targetPos.set(0, 0, -3.5);
-  await sleep(700);
-
-  // 2. Scriptwriter
+  // 2. Scriptwriter (The Writer)
   activeAgentId = "scriptwriter";
-  setActivityStatus("Scriptwriter Agent", "เขียนบทพากย์ 30 วิ + ล็อก Hook 3 วินาทีแรก...", "✍️");
-  await sleep(1400);
+  setActivityStatus("Scriptwriter Agent (นักเขียนบท)", "กำลังเขียนบทพากย์ 30 วิ + ปรับจังหวะ Hook 3 วินาทีแรก...", "✍️");
+  await sleep(1500);
 
-  // Walk towards Shot Director
-  agentCharacters[1].targetPos.set(5.5, 0, 0);
-  await sleep(700);
-
-  // 3. Shot Director
+  // 3. Shot Director (The Visual Director)
   activeAgentId = "shotDirector";
-  setActivityStatus("Shot Director Agent", "วางมุมกล้องถ่ายทำจริงในร้าน (Macro, Wide, Close-up)...", "🎬");
+  setActivityStatus("Shot Director Agent (ผู้กำกับภาพ)", "กำลังวางมุมกล้องถ่ายจริง (Macro, Top-down, Wide)...", "🎬");
   await sleep(1400);
 
-  // Walk towards QA
-  agentCharacters[2].targetPos.set(0, 0, 3.5);
-  await sleep(700);
-
-  // 4. QA Evaluator
+  // 4. QA Auditor (The Reviewer)
   activeAgentId = "qaEvaluator";
-  setActivityStatus("QA Evaluator Agent", "ตรวจสอบคะแนน TikTok Algorithm & ความง่ายในการถ่าย...", "📊");
-  await sleep(1000);
-
-  // Reset positions
-  agentCharacters[0].targetPos.set(stations.strategist.x, 0, stations.strategist.z + 1.6);
-  agentCharacters[1].targetPos.set(stations.scriptwriter.x, 0, stations.scriptwriter.z + 1.6);
-  agentCharacters[2].targetPos.set(stations.shotDirector.x, 0, stations.shotDirector.z - 1.6);
-  agentCharacters[3].targetPos.set(stations.qaEvaluator.x, 0, stations.qaEvaluator.z - 1.6);
+  setActivityStatus("QA Auditor Agent (ฝ่ายตรวจคุณภาพ)", "ตรวจสอบคะแนน TikTok Algorithm & Retention Score...", "📊");
+  await sleep(1100);
 }
 
 function setActivityStatus(name, text, icon) {
@@ -511,7 +524,7 @@ function renderProductionPack(pack) {
         📱 ข้อความบนจอ: <code>${scene.on_screen_text}</code>
       </div>
       <div class="shot-guide-box">
-        <strong>🎥 ไกด์มุมกล้องถ่ายจริง:</strong> ${scene.camera_shot_guide || "มุมถ่ายเจาะตู้ปลาแบบคลีนๆ"}
+        <strong>🎥 ไกด์มุมกล้องถ่ายจริงในร้าน:</strong> ${scene.camera_shot_guide || "มุมถ่ายเจาะตู้ปลาแบบคลีนๆ"}
       </div>
     `;
     scenesList.appendChild(card);
