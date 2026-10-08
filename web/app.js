@@ -1,8 +1,8 @@
 /**
  * Architectural Studio Simulation Engine (Three.js WebGL)
- * - Real Walking Animation (Swinging limbs, hip bobbing, directional turning)
- * - Cute Day / Sunset / Night Atmosphere Cycle
- * - Rich Warm Architectural Color Palette
+ * - Highly Detailed Stylized 3D Characters (Glasses, Lapels, Hair, Shoes, Watches, Cups)
+ * - Fixed Seating & Desk Clearance (Zero Clipping, Proportional Heights)
+ * - Smooth Walking Kinematics & Day/Sunset/Night Cycle
  */
 
 const container = document.getElementById("threeContainer");
@@ -16,9 +16,9 @@ const atmospherePresets = {
     bg: new THREE.Color(0xded7ca),
     fog: new THREE.Color(0xded7ca),
     ambient: new THREE.Color(0xf5ede4),
-    ambientInt: 0.85,
+    ambientInt: 0.9,
     sunColor: new THREE.Color(0xfffaee),
-    sunInt: 1.25,
+    sunInt: 1.3,
     sunPos: new THREE.Vector3(16, 26, 18),
     fillColor: new THREE.Color(0xcfd8dc),
     fillInt: 0.45,
@@ -29,9 +29,9 @@ const atmospherePresets = {
     bg: new THREE.Color(0xdcb896),
     fog: new THREE.Color(0xdcb896),
     ambient: new THREE.Color(0xfde68a),
-    ambientInt: 0.9,
+    ambientInt: 0.95,
     sunColor: new THREE.Color(0xff7733),
-    sunInt: 1.45,
+    sunInt: 1.5,
     sunPos: new THREE.Vector3(26, 14, 16),
     fillColor: new THREE.Color(0xf472b6),
     fillInt: 0.55,
@@ -48,7 +48,7 @@ const atmospherePresets = {
     sunPos: new THREE.Vector3(-14, 22, -10),
     fillColor: new THREE.Color(0x0f172a),
     fillInt: 0.25,
-    deskSpotInt: 1.25,
+    deskSpotInt: 1.35,
     deskSpotColor: new THREE.Color(0xffd8a8)
   }
 };
@@ -60,8 +60,8 @@ let cycleTimer = 0;
 scene.background = atmospherePresets.day.bg.clone();
 scene.fog = new THREE.FogExp2(atmospherePresets.day.fog, 0.016);
 
-const camera = new THREE.PerspectiveCamera(32, container.clientWidth / container.clientHeight, 0.1, 1000);
-camera.position.set(0, 9.5, 27);
+const camera = new THREE.PerspectiveCamera(30, container.clientWidth / container.clientHeight, 0.1, 1000);
+camera.position.set(0, 9.5, 29);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
 renderer.setSize(container.clientWidth, container.clientHeight);
@@ -75,16 +75,16 @@ container.appendChild(renderer.domElement);
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.target.set(0, 2.6, 0);
+controls.target.set(0, 2.7, 0);
 controls.maxPolarAngle = Math.PI / 2.05;
 controls.minDistance = 10;
-controls.maxDistance = 45;
+controls.maxDistance = 48;
 
 // --- 2. Dynamic Lighting Rig ---
 const ambientLight = new THREE.AmbientLight(atmospherePresets.day.ambient, atmospherePresets.day.ambientInt);
 scene.add(ambientLight);
 
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0xc8bfb0, 0.6);
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0xc8bfb0, 0.65);
 scene.add(hemiLight);
 
 const mainSun = new THREE.DirectionalLight(atmospherePresets.day.sunColor, atmospherePresets.day.sunInt);
@@ -93,10 +93,10 @@ mainSun.castShadow = true;
 mainSun.shadow.mapSize.width = 2048;
 mainSun.shadow.mapSize.height = 2048;
 mainSun.shadow.camera.near = 0.5;
-mainSun.shadow.camera.far = 60;
-mainSun.shadow.camera.left = -20;
-mainSun.shadow.camera.right = 20;
-mainSun.shadow.camera.top = 18;
+mainSun.shadow.camera.far = 65;
+mainSun.shadow.camera.left = -22;
+mainSun.shadow.camera.right = 22;
+mainSun.shadow.camera.top = 20;
 mainSun.shadow.camera.bottom = -10;
 mainSun.shadow.bias = -0.0003;
 scene.add(mainSun);
@@ -105,24 +105,25 @@ const fillLight = new THREE.DirectionalLight(atmospherePresets.day.fillColor, at
 fillLight.position.set(-18, 14, -10);
 scene.add(fillLight);
 
-// --- 3. Rich Materials Palette ---
+// --- 3. Material Palette ---
 const mat = (color, roughness = 0.65, metalness = 0.04) =>
   new THREE.MeshStandardMaterial({ color, roughness, metalness });
 
 const whiteDeskMat = mat(0xffffff, 0.25, 0.05);
-const richHoneyOakMat = mat(0xc68b59, 0.7, 0.03); // Rich Warm Oak
+const richHoneyOakMat = mat(0xc68b59, 0.7, 0.03);
 const darkWalnutMat = mat(0x4a2e18, 0.8, 0.02);
 const steelLegMat = mat(0x282624, 0.35, 0.3);
 const terracottaWallMat = mat(0xdfd4c5, 0.9, 0.0);
 const warmParquetMat = mat(0xd6c6b2, 0.75, 0.05);
 const tealFabricMat = mat(0x254b47, 0.7, 0.0);
 const navyFabricMat = mat(0x1e293b, 0.7, 0.0);
-const skinMat = mat(0xffdec7, 0.6, 0.0);
+const skinMat = mat(0xffdec7, 0.55, 0.0);
 const plantGreenMat = mat(0x2e7d32, 0.7, 0.0);
 const coffeeCupMat = mat(0xffffff, 0.3, 0.0);
+const shoeLeatherMat = mat(0x1c1a18, 0.4, 0.1);
+const sneakerWhiteMat = mat(0xf4f4f4, 0.5, 0.0);
 
 // --- 4. Architectural Environment Setup ---
-// Floor with warm parquet tone
 const floorGeo = new THREE.PlaneGeometry(55, 35);
 const floorMesh = new THREE.Mesh(floorGeo, warmParquetMat);
 floorMesh.rotation.x = -Math.PI / 2;
@@ -130,7 +131,6 @@ floorMesh.position.y = 0;
 floorMesh.receiveShadow = true;
 scene.add(floorMesh);
 
-// Back Wall with Moodboard & Architectural Art
 const wallGroup = new THREE.Group();
 wallGroup.position.set(0, 7.5, -4.8);
 
@@ -156,7 +156,7 @@ wallArt.forEach((art) => {
 });
 scene.add(wallGroup);
 
-// Coffee & Espresso Bar Counter (Left side)
+// Espresso & Coffee Counter
 const coffeeStation = new THREE.Group();
 coffeeStation.position.set(-13.5, 0, -1.5);
 
@@ -178,7 +178,6 @@ for (let c = 0; c < 3; c++) {
   coffeeStation.add(cup);
 }
 
-// Lush Indoor Plants in Terracotta Pots
 const plantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.35, 0.9, 16), mat(0xb85d38, 0.8));
 plantPot.position.set(1.4, 0.45, 1.2);
 plantPot.castShadow = true;
@@ -204,7 +203,6 @@ tableTop.castShadow = true;
 tableTop.receiveShadow = true;
 tableGroup.add(tableTop);
 
-// Rich Beveled Honey Oak Trim
 const tableEdge = new THREE.Mesh(new THREE.BoxGeometry(tableLength, 0.08, tableDepth + 0.06), richHoneyOakMat);
 tableEdge.position.set(0, tableHeight - 0.12, 0);
 tableGroup.add(tableEdge);
@@ -293,7 +291,7 @@ nanoAquarium.add(aqGlass);
 
 const aqWater = new THREE.Mesh(
   new THREE.BoxGeometry(1.85, 1.05, 1.05),
-  new THREE.MeshStandardMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.25 })
+  new THREE.MeshStandardMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.22 })
 );
 nanoAquarium.add(aqWater);
 
@@ -312,27 +310,27 @@ tableGroup.add(nanoAquarium);
 
 scene.add(tableGroup);
 
-// --- 6. Ergonomic Task Chairs ---
+// --- 6. Ergonomic Task Chairs (Height = 1.45 at cushion) ---
 function createErgonomicChair(x, z, chairMat) {
   const group = new THREE.Group();
   group.position.set(x, 0, z);
 
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.65, 0.1, 8), steelLegMat);
-  base.position.y = 0.18;
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 0.12, 8), steelLegMat);
+  base.position.y = 0.2;
   group.add(base);
 
-  const column = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1.0, 16), steelLegMat);
-  column.position.y = 0.65;
+  const column = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.15, 16), steelLegMat);
+  column.position.y = 0.75;
   group.add(column);
 
-  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.2, 1.3), chairMat);
-  seat.position.y = 1.25;
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.22, 1.4), chairMat);
+  seat.position.y = 1.35; // Cushion top is at y = 1.46
   seat.castShadow = true;
   group.add(seat);
 
-  const back = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.45, 0.16), chairMat);
-  back.position.set(0, 2.05, 0.58);
-  back.rotation.x = -0.07;
+  const back = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.5, 0.18), chairMat);
+  back.position.set(0, 2.2, 0.62);
+  back.rotation.x = -0.08;
   back.castShadow = true;
   group.add(back);
 
@@ -340,79 +338,138 @@ function createErgonomicChair(x, z, chairMat) {
 }
 
 const chairs = [
-  createErgonomicChair(agentX[0], 1.25, navyFabricMat),
-  createErgonomicChair(agentX[1], 1.25, tealFabricMat),
-  createErgonomicChair(agentX[2], 1.25, tealFabricMat),
-  createErgonomicChair(agentX[3], 1.25, navyFabricMat)
+  createErgonomicChair(agentX[0], 1.4, navyFabricMat),
+  createErgonomicChair(agentX[1], 1.4, tealFabricMat),
+  createErgonomicChair(agentX[2], 1.4, tealFabricMat),
+  createErgonomicChair(agentX[3], 1.4, navyFabricMat)
 ];
 chairs.forEach((c) => scene.add(c));
 
-// --- 7. Full Kinematic Humanoid Agent Rig with Real Walking Skeleton ---
-function createWalkingHumanoidAgent(outfitColor, hairColor, isWoman = false) {
+// --- 7. Highly Detailed 3D Humanoid Agent Rig ---
+function createDetailedHumanoid(cfg) {
   const root = new THREE.Group();
 
-  // Pelvis / Hips Group
+  // Pelvis / Hips Group (Proper seating height at y = 1.48)
   const pelvis = new THREE.Group();
-  pelvis.position.y = 1.35; // Base hip height
+  pelvis.position.y = 1.48;
   root.add(pelvis);
 
-  // Torso
-  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.42, 1.1, 16), mat(outfitColor, 0.8));
+  // Torso / Outer Coat / Cardigan
+  const coatMat = mat(cfg.outfit, 0.75);
+  const innerShirtMat = mat(cfg.innerShirt || 0xffffff, 0.8);
+  const pantsMat = mat(cfg.pants || 0x262420, 0.85);
+  const shoeMat = cfg.isWoman ? sneakerWhiteMat : shoeLeatherMat;
+
+  // Upper Body
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 1.15, 16), coatMat);
   torso.position.y = 0.75;
   torso.castShadow = true;
   pelvis.add(torso);
 
-  // Head
-  const headGroup = new THREE.Group();
-  headGroup.position.y = 1.5;
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 24, 24), skinMat);
-  head.castShadow = true;
-  headGroup.add(head);
+  // Inner Shirt / Lapel V-neck Collar
+  const lapel = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.5, 0.08), innerShirtMat);
+  lapel.position.set(0, 1.05, 0.22);
+  pelvis.add(lapel);
 
-  const hairGeo = isWoman
-    ? new THREE.SphereGeometry(0.42, 20, 20, 0, Math.PI * 2, 0, Math.PI / 1.5)
-    : new THREE.SphereGeometry(0.41, 20, 20, 0, Math.PI * 2, 0, Math.PI / 2);
-  const hair = new THREE.Mesh(hairGeo, mat(hairColor, 0.9));
-  hair.position.set(0, 0.08, 0.02);
-  headGroup.add(hair);
+  // Head & Neck
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.25, 16), skinMat);
+  neck.position.y = 1.42;
+  pelvis.add(neck);
+
+  const headGroup = new THREE.Group();
+  headGroup.position.y = 1.72; // Head center at y = 3.20 (Clearly above table top 2.6!)
+
+  const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.38, 24, 24), skinMat);
+  headMesh.castShadow = true;
+  headGroup.add(headMesh);
+
+  // Stylized Hair
+  const hairMat = mat(cfg.hair, 0.9);
+  if (cfg.isWoman) {
+    // Elegant layered bob hairstyle
+    const hairTop = new THREE.Mesh(new THREE.SphereGeometry(0.42, 20, 20, 0, Math.PI * 2, 0, Math.PI / 1.4), hairMat);
+    hairTop.position.set(0, 0.08, 0.02);
+    headGroup.add(hairTop);
+    const bangs = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.22, 0.16), hairMat);
+    bangs.position.set(0, 0.22, 0.3);
+    headGroup.add(bangs);
+  } else {
+    // Stylized modern parted hairstyle
+    const hairTop = new THREE.Mesh(new THREE.SphereGeometry(0.41, 20, 20, 0, Math.PI * 2, 0, Math.PI / 1.8), hairMat);
+    hairTop.position.set(0, 0.08, 0.02);
+    headGroup.add(hairTop);
+  }
+
+  // Glasses on Strategist / QA
+  if (cfg.hasGlasses) {
+    const glasses = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.02, 8, 16), steelLegMat);
+    const glassesL = glasses.clone();
+    glassesL.position.set(-0.16, 0.05, 0.38);
+    const glassesR = glasses.clone();
+    glassesR.position.set(0.16, 0.05, 0.38);
+    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.02), steelLegMat);
+    bridge.position.set(0, 0.05, 0.38);
+    headGroup.add(glassesL);
+    headGroup.add(glassesR);
+    headGroup.add(bridge);
+  }
+
   pelvis.add(headGroup);
 
-  // Left & Right Arms (Pivoting at Shoulders)
-  const armMat = mat(outfitColor, 0.8);
-  
+  // Left & Right Arms (Pivoting at shoulders)
   const leftArmPivot = new THREE.Group();
-  leftArmPivot.position.set(-0.48, 1.15, 0);
-  const leftArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.16), armMat);
-  leftArmMesh.position.y = -0.36;
-  leftArmMesh.castShadow = true;
-  leftArmPivot.add(leftArmMesh);
+  leftArmPivot.position.set(-0.52, 1.22, 0);
+  const leftUpperArm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.16), coatMat);
+  leftUpperArm.position.y = -0.36;
+  leftUpperArm.castShadow = true;
+  leftArmPivot.add(leftUpperArm);
+  const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 12), skinMat);
+  leftHand.position.y = -0.74;
+  leftArmPivot.add(leftHand);
   pelvis.add(leftArmPivot);
 
   const rightArmPivot = new THREE.Group();
-  rightArmPivot.position.set(0.48, 1.15, 0);
-  const rightArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.16), armMat);
-  rightArmMesh.position.y = -0.36;
-  rightArmMesh.castShadow = true;
-  rightArmPivot.add(rightArmMesh);
+  rightArmPivot.position.set(0.52, 1.22, 0);
+  const rightUpperArm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.72, 0.16), coatMat);
+  rightUpperArm.position.y = -0.36;
+  rightUpperArm.castShadow = true;
+  rightArmPivot.add(rightUpperArm);
+  const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 12), skinMat);
+  rightHand.position.y = -0.74;
+  rightArmPivot.add(rightHand);
   pelvis.add(rightArmPivot);
 
-  // Left & Right Legs (Pivoting at Hips)
-  const pantsMat = mat(0x262420, 0.85);
-
+  // Left & Right Legs with Knees and Shoes
   const leftLegPivot = new THREE.Group();
-  leftLegPivot.position.set(-0.22, 0, 0);
-  const leftLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.25, 0.2), pantsMat);
-  leftLegMesh.position.y = -0.62;
-  leftLegMesh.castShadow = true;
-  leftLegPivot.add(leftLegMesh);
+  leftLegPivot.position.set(-0.24, 0, 0);
+  const leftThigh = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.75, 0.22), pantsMat);
+  leftThigh.position.y = -0.38;
+  leftThigh.castShadow = true;
+  leftLegPivot.add(leftThigh);
+  const leftShin = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.75, 0.2), pantsMat);
+  leftShin.position.set(0, -1.05, 0);
+  leftShin.castShadow = true;
+  leftLegPivot.add(leftShin);
+  const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.14, 0.44), shoeMat);
+  leftShoe.position.set(0, -1.45, 0.08);
+  leftShoe.castShadow = true;
+  leftLegPivot.add(leftShoe);
   pelvis.add(leftLegPivot);
 
   const rightLegPivot = new THREE.Group();
-  rightLegPivot.position.set(0.22, 0, 0);
-  const rightLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.25, 0.2), pantsMat);
-  rightLegMesh.position.y = -0.62;
-  rightLegMesh.castShadow = true;
-  rightLegPivot.add(rightLegMesh);
+  rightLegPivot.position.set(0.24, 0, 0);
+  const rightThigh = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.75, 0.22), pantsMat);
+  rightThigh.position.y = -0.38;
+  rightThigh.castShadow = true;
+  rightLegPivot.add(rightThigh);
+  const rightShin = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.75, 0.2), pantsMat);
+  rightShin.position.set(0, -1.05, 0);
+  rightShin.castShadow = true;
+  rightLegPivot.add(rightShin);
+  const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.14, 0.44), shoeMat);
+  rightShoe.position.set(0, -1.45, 0.08);
+  rightShoe.castShadow = true;
+  rightLegPivot.add(rightShoe);
   pelvis.add(rightLegPivot);
 
   return {
@@ -428,29 +485,29 @@ function createWalkingHumanoidAgent(outfitColor, hairColor, isWoman = false) {
 }
 
 const agentConfigs = [
-  { id: "strategist", deskX: agentX[0], outfit: 0x363330, hair: 0x1f1d1b, isWoman: false, name: "Strategist" },
-  { id: "scriptwriter", deskX: agentX[1], outfit: 0xa14332, hair: 0x804d2e, isWoman: true, name: "Scriptwriter" },
-  { id: "shotDirector", deskX: agentX[2], outfit: 0x6e6558, hair: 0x22201e, isWoman: false, name: "Shot Director" },
-  { id: "qaEvaluator", deskX: agentX[3], outfit: 0xb5a695, hair: 0x3d3025, isWoman: false, name: "QA Auditor" }
+  { id: "strategist", deskX: agentX[0], outfit: 0x363330, innerShirt: 0xf5f5f5, pants: 0xb5a48b, hair: 0x1f1d1b, isWoman: false, hasGlasses: true, name: "Strategist" },
+  { id: "scriptwriter", deskX: agentX[1], outfit: 0xa14332, innerShirt: 0x222222, pants: 0x242424, hair: 0x804d2e, isWoman: true, hasGlasses: false, name: "Scriptwriter" },
+  { id: "shotDirector", deskX: agentX[2], outfit: 0x6e6558, innerShirt: 0xffffff, pants: 0x2b2b2b, hair: 0x22201e, isWoman: false, hasGlasses: false, name: "Shot Director" },
+  { id: "qaEvaluator", deskX: agentX[3], outfit: 0xb5a695, innerShirt: 0x3a4b4c, pants: 0x1f1f1f, hair: 0x3d3025, isWoman: false, hasGlasses: true, name: "QA Auditor" }
 ];
 
 const agents = agentConfigs.map((cfg) => {
-  const char = createWalkingHumanoidAgent(cfg.outfit, cfg.hair, cfg.isWoman);
-  char.root.position.set(cfg.deskX, 0, 1.15);
+  const char = createDetailedHumanoid(cfg);
+  char.root.position.set(cfg.deskX, 0, 1.4); // Seated position at chair
   scene.add(char.root);
 
   return {
     ...cfg,
     ...char,
     targetX: cfg.deskX,
-    targetZ: 1.15,
-    state: "desk", // "desk", "coffee", "stretching", "chatting"
+    targetZ: 1.4,
+    state: "desk",
     stateTimer: Math.random() * 8 + 4,
     walkCycle: 0
   };
 });
 
-// --- 8. Animation & Day/Night Atmosphere Loop ---
+// --- 8. Animation & Walking Kinematics Loop ---
 let clock = new THREE.Clock();
 let activeAgentId = "idle";
 
@@ -458,7 +515,7 @@ function animate() {
   requestAnimationFrame(animate);
   const time = clock.getElapsedTime();
 
-  // 1. Atmosphere Smooth Transition & Auto Cycle
+  // 1. Atmosphere Auto Cycle
   if (autoCycleActive) {
     cycleTimer += 0.003;
     const modes = ["day", "sunset", "night"];
@@ -477,11 +534,10 @@ function animate() {
     f.mesh.rotation.y = -f.angle + Math.PI / 2;
   });
 
-  // 3. Autonomous Behaviors & Kinematic Walking Animation
+  // 3. Characters Behaviors & Kinematics
   agents.forEach((ag, idx) => {
     const isExecuting = activeAgentId === ag.id;
 
-    // Autonomous State Switching
     if (activeAgentId === "idle") {
       ag.stateTimer -= 0.016;
       if (ag.stateTimer <= 0) {
@@ -489,8 +545,8 @@ function animate() {
           const rand = Math.random();
           if (rand < 0.4) {
             ag.state = "coffee";
-            ag.targetX = -12.5; // Walk to Espresso counter
-            ag.targetZ = 0.5;
+            ag.targetX = -12.5;
+            ag.targetZ = 0.6;
             ag.stateTimer = 10.0;
           } else if (rand < 0.7) {
             ag.state = "stretching";
@@ -498,13 +554,13 @@ function animate() {
           } else {
             ag.state = "chatting";
             ag.targetX = ag.deskX + (idx % 2 === 0 ? 2.5 : -2.5);
-            ag.targetZ = 1.8;
+            ag.targetZ = 2.0;
             ag.stateTimer = 7.0;
           }
         } else {
           ag.state = "desk";
           ag.targetX = ag.deskX;
-          ag.targetZ = 1.15;
+          ag.targetZ = 1.4;
           ag.stateTimer = Math.random() * 14 + 6;
         }
       }
@@ -512,75 +568,70 @@ function animate() {
       if (isExecuting && ag.state !== "desk") {
         ag.state = "desk";
         ag.targetX = ag.deskX;
-        ag.targetZ = 1.15;
+        ag.targetZ = 1.4;
       }
     }
 
-    // Distance to Target
     const dx = ag.targetX - ag.root.position.x;
     const dz = ag.targetZ - ag.root.position.z;
     const dist = Math.sqrt(dx * dx + dz * dz);
     const isWalking = dist > 0.15;
 
     if (isWalking) {
-      // --- REAL WALKING KINEMATICS ---
+      // --- WALKING STRIDE ---
       const walkSpeed = 0.05;
       ag.root.position.x += (dx / dist) * walkSpeed;
       ag.root.position.z += (dz / dist) * walkSpeed;
 
-      // Smooth Directional Heading
       const targetAngle = Math.atan2(dx, dz);
       ag.root.rotation.y += (targetAngle - ag.root.rotation.y) * 0.15;
 
       ag.walkCycle += 0.18;
 
-      // Alternating Leg Stride
       ag.leftLegPivot.rotation.x = Math.sin(ag.walkCycle) * 0.65;
       ag.rightLegPivot.rotation.x = -Math.sin(ag.walkCycle) * 0.65;
-
-      // Arm Counter-Swing
       ag.leftArmPivot.rotation.x = -Math.sin(ag.walkCycle) * 0.55;
       ag.rightArmPivot.rotation.x = Math.sin(ag.walkCycle) * 0.55;
 
-      // Hip Vertical Bobbing
-      ag.pelvis.position.y = 1.35 + Math.abs(Math.sin(ag.walkCycle * 2)) * 0.08;
+      ag.pelvis.position.y = 1.6 + Math.abs(Math.sin(ag.walkCycle * 2)) * 0.08;
       ag.headGroup.rotation.x = Math.sin(ag.walkCycle * 2) * 0.04;
     } else {
-      // --- SEATED / STANDING STATIONARY ANIMATIONS ---
+      // --- SEATED / STANDING ---
       ag.root.rotation.y += (0 - ag.root.rotation.y) * 0.1;
-      ag.pelvis.position.y = ag.state === "desk" ? 1.05 : 1.35; // Sit down at desk
 
-      // Reset Leg angles for Sitting vs Standing
       if (ag.state === "desk") {
-        ag.leftLegPivot.rotation.x = -1.45; // 90 degree seated bend
+        // PROPER SEATING HEIGHT (Pelvis sits on cushion at y = 1.48, Torso rises above table)
+        ag.pelvis.position.y = 1.48;
+        ag.leftLegPivot.rotation.x = -1.45;
         ag.rightLegPivot.rotation.x = -1.45;
       } else {
+        // STANDING HEIGHT
+        ag.pelvis.position.y = 1.6;
         ag.leftLegPivot.rotation.x = 0;
         ag.rightLegPivot.rotation.x = 0;
       }
 
-      // Natural Breathing & Posture
       ag.torso.position.y = 0.75 + Math.sin(time * 2 + idx) * 0.02;
-      ag.headGroup.position.y = 1.5 + Math.sin(time * 2 + idx) * 0.03;
+      ag.headGroup.position.y = 1.72 + Math.sin(time * 2 + idx) * 0.03;
 
       if (isExecuting) {
-        // Fast Typing on Laptop
+        // Active Fast Typing on Desk
         ag.leftArmPivot.rotation.x = 0.95 + Math.sin(time * 20) * 0.15;
         ag.rightArmPivot.rotation.x = 0.95 + Math.cos(time * 20) * 0.15;
         ag.headGroup.rotation.x = 0.22 + Math.sin(time * 8) * 0.04;
         deskSpots[idx].intensity = 1.4;
       } else if (ag.state === "stretching") {
-        // Standing and stretching arms high
+        // Standing and stretching arms up
         ag.leftArmPivot.rotation.x = -1.4 + Math.sin(time * 3) * 0.2;
         ag.rightArmPivot.rotation.x = -1.4 + Math.sin(time * 3) * 0.2;
         ag.headGroup.rotation.x = -0.35 + Math.sin(time * 2) * 0.1;
       } else if (ag.state === "coffee") {
-        // Sipping warm coffee
+        // Sipping coffee at espresso counter
         ag.leftArmPivot.rotation.x = 0.4;
         ag.rightArmPivot.rotation.x = 1.35 + Math.sin(time * 1.8) * 0.18;
         ag.headGroup.rotation.x = 0.12 + Math.sin(time * 1.8) * 0.1;
       } else {
-        // Normal Working at Desk
+        // Relaxed Desk Work
         ag.leftArmPivot.rotation.x = 0.85 + Math.sin(time * 2 + idx) * 0.04;
         ag.rightArmPivot.rotation.x = 0.85 + Math.cos(time * 2 + idx) * 0.04;
         ag.headGroup.rotation.y = Math.sin(time * 0.6 + idx * 1.2) * 0.18;
@@ -588,7 +639,6 @@ function animate() {
       }
     }
 
-    // Chair subtle swivel
     chairs[idx].rotation.y = Math.sin(time * 0.5 + idx) * 0.05;
   });
 
@@ -603,7 +653,6 @@ function setAtmosphere(modeKey) {
   const p = atmospherePresets[modeKey];
   if (!p) return;
 
-  // Animate Colors
   scene.background.copy(p.bg);
   scene.fog.color.copy(p.fog);
   ambientLight.color.copy(p.ambient);
@@ -619,13 +668,11 @@ function setAtmosphere(modeKey) {
     spot.intensity = p.deskSpotInt;
   });
 
-  // Update UI button states
   document.querySelectorAll(".cycle-btn:not(.auto-btn)").forEach((b) => {
     b.classList.toggle("active", b.getAttribute("data-time") === modeKey);
   });
 }
 
-// Atmosphere Buttons Event Listeners
 document.querySelectorAll(".cycle-btn[data-time]").forEach((btn) => {
   btn.addEventListener("click", () => {
     autoCycleActive = false;
@@ -662,7 +709,6 @@ const resultContent = document.getElementById("resultContent");
 
 let currentPackData = null;
 
-// Preset Chip Clicks
 chips.forEach((chip) => {
   chip.addEventListener("click", () => {
     chips.forEach((c) => c.classList.remove("active"));
@@ -671,7 +717,6 @@ chips.forEach((chip) => {
   });
 });
 
-// Submit Workflow
 generateForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const topic = topicInput.value.trim();
@@ -680,10 +725,8 @@ generateForm.addEventListener("submit", async (e) => {
   startBtn.disabled = true;
   startBtn.style.opacity = "0.6";
 
-  // Trigger Lively Agent Step Sequence
   await runStudioPipelineSequence(topic);
 
-  // Fetch from Python backend
   try {
     const res = await fetch("/api/generate", {
       method: "POST",
@@ -710,22 +753,18 @@ generateForm.addEventListener("submit", async (e) => {
 });
 
 async function runStudioPipelineSequence(topic) {
-  // 1. Strategist
   activeAgentId = "strategist";
   setActivityStatus("Strategist Agent", `Researching audience pain points and viral hooks for: "${topic}"`);
   await sleep(1500);
 
-  // 2. Scriptwriter
   activeAgentId = "scriptwriter";
   setActivityStatus("Scriptwriter Agent", "Composing 30s voiceover script and 3-second retention hook...");
   await sleep(1600);
 
-  // 3. Shot Director
   activeAgentId = "shotDirector";
   setActivityStatus("Shot Director Agent", "Directing physical camera angles (Macro close-up, Top-down, Wide setup)...");
   await sleep(1500);
 
-  // 4. QA Auditor
   activeAgentId = "qaEvaluator";
   setActivityStatus("QA Auditor Agent", "Auditing algorithm retention score and filming feasibility...");
   await sleep(1200);
@@ -741,7 +780,6 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Render Production Pack to UI
 function renderProductionPack(pack) {
   emptyState.classList.add("hidden");
   resultContent.classList.remove("hidden");
@@ -749,17 +787,14 @@ function renderProductionPack(pack) {
   const script = pack.script;
   const qa = pack.qa_report;
 
-  // QA Scores
   document.getElementById("qaOverallScore").innerText = qa.overall_score.toFixed(1);
   document.getElementById("qaHookScore").innerText = `${qa.hook_score}/10`;
   document.getElementById("qaRetentionScore").innerText = `${qa.retention_score}/10`;
   document.getElementById("qaCommentScore").innerText = `${qa.comment_trigger_score}/10`;
   document.getElementById("qaVisualScore").innerText = `${qa.filming_feasibility || 10}/10`;
 
-  // Hook Text
   document.getElementById("scriptHookText").innerText = `"${script.hook_3sec}"`;
 
-  // Scenes List
   const scenesList = document.getElementById("scenesList");
   scenesList.innerHTML = "";
 
@@ -784,7 +819,6 @@ function renderProductionPack(pack) {
     scenesList.appendChild(card);
   });
 
-  // Publishing
   document.getElementById("captionText").innerText = `${script.caption_th}\n\n${script.hashtags.join(" ")}`;
   document.getElementById("pinnedCommentText").innerText = `"${script.pinned_comment}"`;
 }
