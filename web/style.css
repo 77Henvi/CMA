@@ -359,92 +359,180 @@ body {
 /* Floating Bottom Dock */
 .bottom-dock {
   position: absolute;
-  bottom: 20px;
+  bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
-  max-width: 860px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(18px);
-  border: 1px solid var(--border-medium);
+  width: calc(100% - 48px);
+  max-width: 960px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(220, 212, 200, 0.85);
   border-radius: 20px;
   padding: 12px 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.14);
+  gap: 10px;
+  box-shadow: 0 16px 40px rgba(45, 40, 35, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
   z-index: 20;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .preset-chips {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .chip {
-  background: rgba(245, 241, 235, 0.9);
-  border: 1px solid var(--border-light);
-  color: var(--text-main);
+  background: rgba(246, 242, 236, 0.95);
+  border: 1px solid rgba(225, 217, 205, 0.8);
+  color: var(--text-secondary);
   font-size: 0.74rem;
-  font-weight: 500;
-  padding: 4px 10px;
+  font-weight: 600;
+  padding: 5px 12px;
   border-radius: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
+  user-select: none;
 }
 
-.chip:hover, .chip.active {
+.chip:hover {
+  background: rgba(235, 229, 220, 1);
+  color: var(--text-main);
+  border-color: rgba(195, 185, 170, 0.9);
+}
+
+.chip.active {
   background: var(--accent-teal);
   border-color: var(--accent-teal);
   color: #ffffff;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(45, 85, 80, 0.28);
 }
 
 .dock-form {
   display: flex;
   gap: 8px;
   align-items: center;
+  width: 100%;
 }
 
 .dock-form input {
   flex: 1;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
-  padding: 9px 14px;
+  height: 42px;
+  background: #ffffff;
+  border: 1px solid rgba(215, 205, 192, 0.85);
+  border-radius: 10px;
+  padding: 0 16px;
   color: var(--text-main);
-  font-size: 0.84rem;
+  font-size: 0.86rem;
+  font-family: inherit;
   outline: none;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
   transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
 .dock-form input:focus {
   border-color: var(--accent-teal);
-  box-shadow: 0 0 0 3px rgba(45, 85, 80, 0.12);
+  box-shadow: 0 0 0 3px rgba(45, 85, 80, 0.14);
+}
+
+.btn-primary {
+  height: 42px;
+  background: var(--accent-teal);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 0 18px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(45, 85, 80, 0.26);
+  transition: all 0.18s ease;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.btn-primary:hover {
+  background: #254642;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(45, 85, 80, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  height: 42px;
+  background: #ffffff;
+  border: 1px solid rgba(215, 205, 192, 0.9);
+  color: var(--text-main);
+  border-radius: 10px;
+  padding: 0 16px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.18s ease;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.btn-secondary:hover {
+  background: rgba(248, 245, 240, 1);
+  border-color: var(--accent-teal);
+  color: var(--accent-teal);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
 }
 
 .btn-outline-pill {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-medium);
+  height: 42px;
+  background: rgba(45, 85, 80, 0.06);
+  border: 1px solid rgba(45, 85, 80, 0.25);
   color: var(--accent-teal);
-  border-radius: var(--radius-sm);
-  padding: 0 12px;
-  height: 38px;
+  border-radius: 10px;
+  padding: 0 16px;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
+  font-family: inherit;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
+  justify-content: center;
+  gap: 7px;
   white-space: nowrap;
+  transition: all 0.18s ease;
+  user-select: none;
+  box-sizing: border-box;
 }
 
 .btn-outline-pill:hover {
-  background: rgba(45, 85, 80, 0.08);
+  background: rgba(45, 85, 80, 0.12);
   border-color: var(--accent-teal);
+  transform: translateY(-1px);
+}
+
+.btn-outline-pill:active {
+  transform: translateY(0);
 }
 
 /* Slide-Over Output Drawer & Backdrop */
