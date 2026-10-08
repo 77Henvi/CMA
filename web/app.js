@@ -122,6 +122,32 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// --- Production Sheet Drawer Logic ---
+const outputDrawer = document.getElementById("outputDrawer");
+const drawerOverlay = document.getElementById("drawerOverlay");
+const openSheetBtn = document.getElementById("openSheetBtn");
+const openDrawerQuickBtn = document.getElementById("openDrawerQuickBtn");
+const closeDrawerBtn = document.getElementById("closeDrawerBtn");
+const sheetUpdateDot = document.getElementById("sheetUpdateDot");
+
+function openDrawer() {
+  if (!outputDrawer) return;
+  outputDrawer.classList.add("open");
+  if (drawerOverlay) drawerOverlay.style.display = "block";
+  if (sheetUpdateDot) sheetUpdateDot.style.display = "none";
+}
+
+function closeDrawer() {
+  if (!outputDrawer) return;
+  outputDrawer.classList.remove("open");
+  if (drawerOverlay) drawerOverlay.style.display = "none";
+}
+
+openSheetBtn?.addEventListener("click", openDrawer);
+openDrawerQuickBtn?.addEventListener("click", openDrawer);
+closeDrawerBtn?.addEventListener("click", closeDrawer);
+drawerOverlay?.addEventListener("click", closeDrawer);
+
 function renderProductionPack(pack) {
   emptyState.classList.add("hidden");
   resultContent.classList.remove("hidden");
@@ -136,6 +162,10 @@ function renderProductionPack(pack) {
   document.getElementById("qaVisualScore").innerText = `${qa.filming_feasibility || 10}/10`;
 
   document.getElementById("scriptHookText").innerText = `"${script.hook_3sec}"`;
+
+  // Show notification dot and open drawer smoothly
+  if (sheetUpdateDot) sheetUpdateDot.style.display = "block";
+  openDrawer();
 
   const scenesList = document.getElementById("scenesList");
   scenesList.innerHTML = "";
