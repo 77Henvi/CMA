@@ -144,11 +144,18 @@
 
         <!-- Bottom Floating Control Bar -->
         <div class="bottom-dock">
-          <div class="preset-chips">
-            <button class="chip active" data-topic="ทำไมปลานีออนไม่ยอมว่ายรวมฝูง และวิธีแก้">ปลานีออนไม่รวมฝูง</button>
-            <button class="chip" data-topic="3 ความเข้าใจผิดในการเลี้ยงปลากัด ที่ทำให้ปลาป่วย">ความลับการเลี้ยงปลากัด</button>
-            <button class="chip" data-topic="วิธีแก้น้ำขุ่นในตู้ปลาให้ใสวิ้ง ไม่ต้องล้างตู้บ่อย">แก้น้ำขุ่นถาวร</button>
-            <button class="chip" data-topic="จัดตู้ปลามินิมอลบนโต๊ะทำงาน สวยคลีน สบายตา">จัดตู้มินิมอลบนโต๊ะ</button>
+          <div class="dock-topics-bar">
+            <div class="preset-chips" id="presetChips">
+              <!-- Dynamically populated with 4 auto-refreshing topics (5m timer) -->
+            </div>
+            <button type="button" class="chip-refresh-btn" id="refreshTopicsBtn" title="Brainstorm new topics immediately">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M23 4v6h-6"/>
+                <path d="M1 20v-6h6"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+              <span>New Ideas</span>
+            </button>
           </div>
 
           <form id="generateForm" class="input-group dock-form">

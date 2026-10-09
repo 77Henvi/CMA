@@ -378,23 +378,36 @@ body {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.dock-topics-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
 .preset-chips {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   align-items: center;
+  flex: 1;
 }
 
 .chip {
   background: rgba(246, 242, 236, 0.95);
-  border: 1px solid rgba(225, 217, 205, 0.8);
+  border: 1px solid rgba(225, 217, 205, 0.85);
   color: var(--text-secondary);
   font-size: 0.74rem;
   font-weight: 600;
-  padding: 5px 12px;
+  padding: 4px 10px;
   border-radius: 14px;
   cursor: pointer;
-  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
 }
 
@@ -409,6 +422,94 @@ body {
   border-color: var(--accent-teal);
   color: #ffffff;
   box-shadow: 0 2px 8px rgba(45, 85, 80, 0.28);
+}
+
+.chip-label {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.chip-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1px 6px;
+  border-radius: 8px;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
+}
+
+.chip-timer.urgent {
+  color: #c2410c;
+  background: rgba(194, 65, 12, 0.12);
+  font-weight: 700;
+}
+
+.chip.active .chip-timer {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.chip-refresh-btn {
+  background: transparent;
+  border: 1px dashed rgba(200, 190, 175, 0.8);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.chip-refresh-btn:hover {
+  color: var(--accent-teal);
+  border-color: var(--accent-teal);
+  background: rgba(45, 85, 80, 0.06);
+}
+
+.chip-refresh-btn.spinning svg {
+  animation: spin 0.6s linear infinite;
+}
+
+.chip.entering {
+  animation: chipIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.chip.expiring {
+  animation: chipOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes chipIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes chipOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.92) translateY(-4px);
+  }
 }
 
 .dock-form {

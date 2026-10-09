@@ -37,23 +37,266 @@ function toast(msg) {
 const topicInput = document.getElementById("topicInput");
 const generateForm = document.getElementById("generateForm");
 const startBtn = document.getElementById("startBtn");
-const chips = document.querySelectorAll(".preset-chips .chip");
-
 const activeAgentName = document.getElementById("activeAgentName");
 const activityStatus = document.getElementById("activityStatus");
-
 const emptyState = document.getElementById("emptyState");
 const resultContent = document.getElementById("resultContent");
-
 let currentPackData = null;
 
-chips.forEach((chip) => {
-  chip.addEventListener("click", () => {
-    chips.forEach((c) => c.classList.remove("active"));
-    chip.classList.add("active");
-    topicInput.value = chip.getAttribute("data-topic");
+// --- Dynamic 4-Topic Manager with 5-Minute Auto-Refresh ---
+const TOPIC_COUNTDOWN_SEC = 300; // 5 minutes per topic
+const MAX_TOPICS = 4;
+
+const FALLBACK_TOPIC_BANK = [
+  { id: "neon-flock", label: "ปลานีออนไม่รวมฝูง", query: "ทำไมปลานีออนไม่ยอมว่ายรวมฝูง และวิธีฝึกให้เกาะกลุ่ม" },
+  { id: "betta-myth", label: "ความลับเลี้ยงปลากัด", query: "3 ความเข้าใจผิดในการเลี้ยงปลากัด ที่ทำให้ปลาป่วยเงียบๆ" },
+  { id: "cloudy-water", label: "แก้น้ำขุ่นถาวร", query: "วิธีแก้น้ำขุ่นในตู้ปลาให้ใสวิ้ง ไม่ต้องล้างตู้บ่อย" },
+  { id: "minimal-tank", label: "จัดตู้มินิมอลบนโต๊ะ", query: "วิธีจัดตู้ปลามินิมอลบนโต๊ะทำงาน สวยคลีน สบายตา" },
+  { id: "shrimp-molt", label: "กุ้งแคระลอกคราบ", query: "วิธีกู้ชีพกุ้งแคระลอกคราบไม่ออก และปรับค่าน้ำป้องกัน" },
+  { id: "hair-algae", label: "กำจัดตะไคร่เส้นผม", query: "เทคนิคกำจัดตะไคร่เส้นผมในตู้ไม้น้ำ แบบถอนรากถอนโคน" },
+  { id: "cardinal-vs-neon", label: "คาร์ดินัล vs นีออน", query: "ปลาคาร์ดินัลกับปลานีออน ต่างกันยังไง เลือกตัวไหนเลี้ยงง่ายกว่า" },
+  { id: "ich-white-spot", label: "รักษาโรคจุดขาว", query: "วิธีรักษาโรคจุดขาวในตู้ปลาช่วงหน้าหนาว ไม่ให้ลามทั้งตู้" },
+  { id: "goldfish-swim", label: "ปลาทองหงายท้อง", query: "สาเหตุปลาทองว่ายหงายท้อง เสียศูนย์ และวิธีปฐมพยาบาลด่วน" },
+  { id: "plant-melting", label: "ต้นไม้น้ำใบละลาย", query: "ต้นไม้น้ำใบละลายหลังปักตู้ใหม่ แก้ปัญหาอย่างไรให้แตกยอดใหม่" },
+  { id: "corydoras-sand", label: "ปลาแพะคุ้ยทราย", query: "เลือกทรายรองพื้นให้ปลาแพะยังไง ไม่ให้หนวดกุดและติดเชื้อ" },
+  { id: "water-change", label: "เทคนิคเปลี่ยนน้ำ 20%", query: "วิธีเปลี่ยนน้ำตู้ปลา 20% โดยที่ปลาไม่ช็อกและแบคทีเรียไม่พัง" },
+  { id: "filter-media", label: "จัดเรียงมีเดียกรอง", query: "วิธีจัดเรียงมีเดียกรองนอกตู้ปลาให้น้ำใสและดักฝุ่นดีที่สุด" },
+  { id: "nerite-snail", label: "หอยเขาคุมตะไคร่", query: "ข้อดีข้อเสียของหอยเขา เลี้ยงยังไงไม่ให้ไข่ติดเต็มขอนไม้" }
+];
+
+let activeTopicSlots = [];
+let topicTimerInterval = null;
+const presetChipsContainer = document.getElementById("presetChips");
+const refreshTopicsBtn = document.getElementById("refreshTopicsBtn");
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function selectTopicSlot(index) {
+  activeTopicSlots.forEach((slot, i) => {
+    slot.isSelected = (i === index);
   });
+  const selected = activeTopicSlots[index];
+  if (selected && topicInput) {
+    topicInput.value = selected.query;
+  }
+  updateTimerDisplays();
+}
+
+function renderTopicChips() {
+  if (!presetChipsContainer) return;
+  presetChipsContainer.innerHTML = "";
+  activeTopicSlots.forEach((slot, index) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `chip ${slot.isSelected ? "active" : ""} ${slot.isNew ? "entering" : ""}`;
+    btn.dataset.index = index;
+    btn.dataset.id = slot.id;
+
+    const labelSpan = document.createElement("span");
+    labelSpan.className = "chip-label";
+    labelSpan.textContent = slot.label;
+
+    const timerSpan = document.createElement("span");
+    timerSpan.className = `chip-timer ${slot.remainingSec <= 60 && !slot.isSelected ? "urgent" : ""}`;
+
+    if (slot.isSelected) {
+      timerSpan.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Active`;
+    } else {
+      timerSpan.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 15 14"/></svg>${formatTime(slot.remainingSec)}`;
+    }
+
+    btn.appendChild(labelSpan);
+    btn.appendChild(timerSpan);
+
+    btn.addEventListener("click", () => {
+      selectTopicSlot(index);
+    });
+
+    presetChipsContainer.appendChild(btn);
+  });
+}
+
+function updateTimerDisplays() {
+  if (!presetChipsContainer) return;
+  const chipButtons = presetChipsContainer.querySelectorAll(".chip");
+  chipButtons.forEach((btn, index) => {
+    const slot = activeTopicSlots[index];
+    if (!slot) return;
+    const timerSpan = btn.querySelector(".chip-timer");
+    if (!timerSpan) return;
+
+    if (slot.isSelected) {
+      if (!btn.classList.contains("active")) {
+        btn.classList.add("active");
+      }
+      timerSpan.className = "chip-timer";
+      timerSpan.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Active`;
+    } else {
+      btn.classList.remove("active");
+      timerSpan.className = `chip-timer ${slot.remainingSec <= 60 ? "urgent" : ""}`;
+      timerSpan.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 15 14"/></svg>${formatTime(slot.remainingSec)}`;
+    }
+  });
+}
+
+async function replaceExpiredTopic(index) {
+  const slot = activeTopicSlots[index];
+  if (!slot || slot.isReplacing) return;
+  slot.isReplacing = true;
+
+  // Animate out
+  const chipButtons = presetChipsContainer ? presetChipsContainer.querySelectorAll(".chip") : [];
+  const targetBtn = chipButtons[index];
+  if (targetBtn) {
+    targetBtn.classList.add("expiring");
+  }
+
+  // Collect current active topic IDs & labels to exclude
+  const exclude = activeTopicSlots.map(s => s.id || s.label);
+  let newTopic = null;
+
+  try {
+    const res = await fetch(`/api/topics?count=1&exclude=${encodeURIComponent(exclude.join(","))}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.topics && data.topics.length > 0) {
+        newTopic = data.topics[0];
+      }
+    }
+  } catch (err) {
+    console.warn("Topic fetch error:", err);
+  }
+
+  if (!newTopic) {
+    const available = FALLBACK_TOPIC_BANK.filter(f => !exclude.includes(f.id) && !exclude.includes(f.label));
+    newTopic = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : FALLBACK_TOPIC_BANK[index % FALLBACK_TOPIC_BANK.length];
+  }
+
+  await new Promise(r => setTimeout(r, 260));
+
+  activeTopicSlots[index] = {
+    id: newTopic.id || "topic-" + Date.now(),
+    label: newTopic.label,
+    query: newTopic.query,
+    remainingSec: TOPIC_COUNTDOWN_SEC,
+    isSelected: false,
+    isReplacing: false,
+    isNew: true
+  };
+
+  renderTopicChips();
+
+  setTimeout(() => {
+    if (activeTopicSlots[index]) {
+      activeTopicSlots[index].isNew = false;
+      const b = presetChipsContainer ? presetChipsContainer.querySelectorAll(".chip")[index] : null;
+      if (b) b.classList.remove("entering");
+    }
+  }, 400);
+}
+
+function tickTopicTimers() {
+  let needUpdate = false;
+  activeTopicSlots.forEach((slot, index) => {
+    if (!slot.isSelected && !slot.isReplacing) {
+      slot.remainingSec -= 1;
+      needUpdate = true;
+
+      if (slot.remainingSec <= 0) {
+        slot.remainingSec = 0;
+        replaceExpiredTopic(index);
+      }
+    }
+  });
+
+  if (needUpdate) {
+    updateTimerDisplays();
+  }
+}
+
+async function refreshAllTopics(initial = false) {
+  if (refreshTopicsBtn) refreshTopicsBtn.classList.add("spinning");
+
+  const exclude = initial ? [] : activeTopicSlots.map(s => s.id || s.label);
+  let freshTopics = [];
+  try {
+    const res = await fetch(`/api/topics?count=${MAX_TOPICS}&exclude=${encodeURIComponent(exclude.join(","))}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.topics && data.topics.length > 0) {
+        freshTopics = data.topics;
+      }
+    }
+  } catch (e) {
+    console.warn("Could not fetch fresh topics:", e);
+  }
+
+  if (freshTopics.length < MAX_TOPICS) {
+    const pool = [...FALLBACK_TOPIC_BANK].sort(() => 0.5 - Math.random());
+    freshTopics = pool.slice(0, MAX_TOPICS);
+  }
+
+  // Preserve user's input if they had already selected something
+  const currentVal = topicInput ? topicInput.value.trim() : "";
+  let matchedIdx = -1;
+
+  activeTopicSlots = freshTopics.slice(0, MAX_TOPICS).map((t, idx) => {
+    const isSel = (currentVal && t.query === currentVal) || (!currentVal && idx === 0);
+    if (isSel) matchedIdx = idx;
+    return {
+      id: t.id,
+      label: t.label,
+      query: t.query,
+      remainingSec: TOPIC_COUNTDOWN_SEC,
+      isSelected: isSel,
+      isReplacing: false,
+      isNew: true
+    };
+  });
+
+  if (matchedIdx === -1 && activeTopicSlots.length > 0) {
+    activeTopicSlots[0].isSelected = true;
+    if (topicInput) topicInput.value = activeTopicSlots[0].query;
+  } else if (matchedIdx !== -1 && topicInput) {
+    topicInput.value = activeTopicSlots[matchedIdx].query;
+  }
+
+  renderTopicChips();
+
+  if (!topicTimerInterval) {
+    topicTimerInterval = setInterval(tickTopicTimers, 1000);
+  }
+
+  setTimeout(() => {
+    if (refreshTopicsBtn) refreshTopicsBtn.classList.remove("spinning");
+    activeTopicSlots.forEach(s => (s.isNew = false));
+    if (presetChipsContainer) {
+      presetChipsContainer.querySelectorAll(".chip").forEach(b => b.classList.remove("entering"));
+    }
+  }, 400);
+}
+
+refreshTopicsBtn?.addEventListener("click", () => {
+  refreshAllTopics(false);
 });
+
+topicInput?.addEventListener("input", () => {
+  const currentVal = topicInput.value.trim();
+  const matchedIndex = activeTopicSlots.findIndex(s => s.query === currentVal);
+  if (matchedIndex === -1) {
+    activeTopicSlots.forEach(s => (s.isSelected = false));
+  } else {
+    activeTopicSlots.forEach((s, idx) => (s.isSelected = idx === matchedIndex));
+  }
+  updateTimerDisplays();
+});
+
+// Kick off initial topics load
+refreshAllTopics(true);
 
 async function fetchPack(topic) {
   try {

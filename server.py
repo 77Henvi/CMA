@@ -71,6 +71,17 @@ class Handler(SimpleHTTPRequestHandler):
             result = higgsfield.check_status(rid)
             result.pop("raw", None)
             return self._json(result)
+        if url.path == "/api/topics":
+            query_params = urllib.parse.parse_qs(url.query)
+            try:
+                count = int(query_params.get("count", ["4"])[0])
+            except ValueError:
+                count = 4
+            count = max(1, min(count, 8))
+            exclude_raw = query_params.get("exclude", [""])[0]
+            exclude = [x.strip() for x in exclude_raw.split(",") if x.strip()]
+            topics = pipeline.strategist.brainstorm_topics(count=count, exclude=exclude)
+            return self._json({"status": "success", "topics": topics})
         return super().do_GET()
 
     def do_POST(self):
