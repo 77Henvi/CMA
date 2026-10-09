@@ -295,7 +295,7 @@ body {
 
 .live-activity-bar {
   position: absolute;
-  top: 68px;
+  top: 18px;
   left: 20px;
   max-width: 480px;
   background: rgba(255, 255, 255, 0.90);
